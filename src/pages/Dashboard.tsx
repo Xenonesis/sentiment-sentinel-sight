@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Brain, Activity, AlertCircle, Settings } from 'lucide-react';
+import { Brain, Activity, AlertCircle, Settings, Info } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { SettingsPage } from '@/components/SettingsPage';
 import { SentimentForm } from '@/components/SentimentForm';
 import { EmotionFeed } from '@/components/EmotionFeed';
@@ -16,6 +17,7 @@ export const Dashboard = () => {
   const [currentResult, setCurrentResult] = useState<SentimentResult | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const {
     isLoading,

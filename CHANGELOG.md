@@ -215,7 +215,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - **Radix UI**: For the component primitives
 - **Tailwind CSS**: For the utility-first CSS framework
 - **Framer Motion**: For smooth animations
-- **Lovable**: For the development platform
 
 ---
 

@@ -1,5 +1,5 @@
 # FastAPI Backend Reference Code
-# This file is for reference only - Lovable cannot run Python backends directly
+# This file is for reference only
 # You can use this code in your local development environment
 
 from fastapi import FastAPI, HTTPException

@@ -454,7 +454,6 @@ copies or substantial portions of the Software.
 - **[Radix UI](https://www.radix-ui.com/)** - For accessible component primitives
 - **[Tailwind CSS](https://tailwindcss.com/)** - For the utility-first CSS framework
 - **[Framer Motion](https://www.framer.com/motion/)** - For smooth animations
-- **[Lovable](https://lovable.dev/)** - For the development platform
 
 ### **Inspiration**
 - **Customer Support Teams** - For inspiring the need for sentiment analysis
