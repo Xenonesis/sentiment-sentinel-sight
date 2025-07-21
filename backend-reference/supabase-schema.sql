@@ -1,4 +1,4 @@
--- Supabase database schema for Customer Sentiment Watchdog
+-- Supabase database schema for Sentinel Sight
 -- Run these SQL commands in your Supabase SQL editor
 
 -- Create the sentiment_analysis table

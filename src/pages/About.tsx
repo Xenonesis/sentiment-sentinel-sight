@@ -158,7 +158,7 @@ const About = () => {
               <Brain className="h-8 w-8 text-white" />
             </div>
             <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              Customer Sentiment Watchdog
+              Sentinel Sight
             </h1>
           </div>
           
@@ -211,7 +211,7 @@ const About = () => {
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-4">Key Features</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Discover the powerful capabilities that make Customer Sentiment Watchdog 
+              Discover the powerful capabilities that make Sentinel Sight 
               the ultimate tool for understanding customer emotions.
             </p>
           </div>

@@ -1,6 +1,6 @@
 # 📋 Changelog
 
-All notable changes to the Customer Sentiment Watchdog project will be documented in this file
+All notable changes to the Sentinel Sight project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -25,7 +25,39 @@ This release upgrades the AI capabilities by integrating Google's Gemini 2.0 Fla
 
 ---
 
-## [0.10.0] - 2024-12-19 🎉
+## [0.70.0] - 2025-01-22 🚀
+
+### 🎯 **Major Brand Evolution & Legal Framework**
+
+#### ✨ **New Features**
+- **🏷️ Complete Brand Transformation**: Rebranded from "Customer Sentiment Watchdog" to "Sentinel Sight"
+- **📄 Comprehensive Legal Pages**: Added Privacy Policy, Terms of Service, and Cookie Policy
+- **🔍 Enhanced SEO**: Improved meta tags, keywords, and social media optimization
+- **📱 PWA Ready**: Added mobile app meta tags and theme color support
+- **🎨 Consistent Branding**: Updated all components, documentation, and legal references
+
+#### 🛠️ **Improvements**
+- **📊 Enhanced Footer**: Updated with proper legal page navigation and branding
+- **🔗 Navigation**: Added routes for `/privacy`, `/terms`, and `/cookies`
+- **📝 Documentation**: Comprehensive updates to README.md with new branding
+- **⚖️ Legal Compliance**: Professional legal pages with detailed policies
+- **🎯 Brand Identity**: Consistent "Sentinel Sight" branding across all touchpoints
+
+#### 🐛 **Bug Fixes**
+- **🔧 Repository References**: Updated all GitHub URLs to new repository name
+- **📧 Contact Information**: Updated email addresses to sentinelsight.com domain
+- **📦 Package Name**: Updated from "vite_react_shadcn_ts" to "sentinel-sight"
+- **🏠 Directory Names**: Fixed installation guide directory references
+
+#### 📚 **Documentation**
+- **📖 Updated README**: Enhanced with Sentinel Sight branding and features
+- **⚖️ Legal Pages**: Comprehensive Privacy Policy, Terms of Service, Cookie Policy
+- **🎨 Design Specs**: Updated UI/UX enhancement specifications
+- **📧 Contact Updates**: New email addresses for support, legal, privacy, and cookies
+
+---
+
+## [0.10.0] - 2025-01-01 🎉
 
 ### 🚀 **Major Release - Full-Featured Sentiment Analysis Platform**
 

@@ -1,0 +1,11 @@
+message,customer_id,channel
+"I love this product! It works perfectly and exceeded my expectations.",CUST_001,email
+"The service was terrible and I am very disappointed with the response time.",CUST_002,chat
+"Thank you for the quick response to my inquiry. Very helpful support team!",CUST_003,phone
+"The product quality could be better for the price point. Not satisfied.",CUST_004,review
+"Amazing customer service! The representative was very knowledgeable and friendly.",CUST_005,social
+"I'm having issues with the login process. It keeps giving me error messages.",CUST_006,email
+"Outstanding product quality! Will definitely recommend to friends and family.",CUST_007,review
+"The delivery was delayed and no one informed me about it. Very frustrating experience.",CUST_008,chat
+"Great value for money. The features work exactly as advertised.",CUST_009,phone
+"I need help with setting up my account. The instructions are confusing.",CUST_010,social

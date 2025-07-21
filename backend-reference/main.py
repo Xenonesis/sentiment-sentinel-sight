@@ -13,7 +13,7 @@ from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassifica
 import torch
 
 # Initialize FastAPI app
-app = FastAPI(title="Customer Sentiment Watchdog API", version="1.0.0")
+app = FastAPI(title="Sentinel Sight API", version="1.0.0")
 
 # Configure CORS
 app.add_middleware(
@@ -63,7 +63,7 @@ class SentimentResponse(BaseModel):
 
 @app.get("/")
 async def root():
-    return {"message": "Customer Sentiment Watchdog API", "status": "running"}
+    return {"message": "Sentinel Sight API", "status": "running"}
 
 @app.get("/health")
 async def health_check():

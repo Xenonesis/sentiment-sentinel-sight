@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Brain, Activity, AlertCircle, Settings, Info, Download, Trash2, Database } from 'lucide-react';
+import { Brain, Activity, AlertCircle, Settings, Info, Download, Trash2, Database, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SettingsPage } from '@/components/SettingsPage';
 import { SentimentForm } from '@/components/SentimentForm';
 import { EmotionFeed } from '@/components/EmotionFeed';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { ExportModal } from '@/components/ExportModal';
+import { BulkAnalysisModal } from '@/components/BulkAnalysisModal';
+import { AdvancedAnalyticsDashboard } from '@/components/AdvancedAnalyticsDashboard';
 import { useSentimentAnalysis, SentimentResult } from '@/hooks/useSentimentAnalysis';
 import { usePersistedSentiments } from '@/hooks/usePersistedSentiments';
 import { useToast } from '@/hooks/use-toast';
@@ -20,6 +22,7 @@ export const Dashboard = () => {
   const [currentResult, setCurrentResult] = useState<SentimentResult | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showAdvancedAnalytics, setShowAdvancedAnalytics] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -80,6 +83,21 @@ export const Dashboard = () => {
     }
   };
 
+  const handleBulkComplete = (results: SentimentResult[]) => {
+    // Add all results to the sentiment history
+    results.forEach(result => addSentiment(result));
+    
+    // Set the last result as current for display
+    if (results.length > 0) {
+      setCurrentResult(results[results.length - 1]);
+    }
+    
+    toast({
+      title: "Bulk Analysis Complete",
+      description: `Successfully processed ${results.length} messages. Check the emotion feed for all results.`,
+    });
+  };
+
   // Show loading screen while model is loading
   if (isLoading && !isModelLoaded && !isGeminiConfigured) {
     return <LoadingScreen />;
@@ -100,7 +118,7 @@ export const Dashboard = () => {
             </div>
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                Customer Sentiment Watchdog
+                Sentinel Sight
               </h1>
               <p className="text-muted-foreground">
                 AI-powered emotion detection for customer communications
@@ -108,6 +126,20 @@ export const Dashboard = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <BulkAnalysisModal
+              onAnalyze={handleAnalyze}
+              onBulkComplete={handleBulkComplete}
+              isAnalyzing={isLoading}
+            />
+            <Button
+              variant="outline"
+              onClick={() => setShowAdvancedAnalytics(!showAdvancedAnalytics)}
+              disabled={sentiments.length === 0}
+              className={`flex items-center gap-2 ${showAdvancedAnalytics ? 'bg-primary text-primary-foreground' : ''}`}
+            >
+              <BarChart3 className="h-4 w-4" />
+              {showAdvancedAnalytics ? 'Back to Dashboard' : 'Analytics'}
+            </Button>
             <Button
               variant="outline"
               onClick={() => setShowExportModal(true)}
@@ -188,35 +220,51 @@ export const Dashboard = () => {
           </motion.div>
         )}
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Column - Analysis Form */}
+        {/* Main Content */}
+        {showAdvancedAnalytics ? (
+          /* Advanced Analytics Dashboard */
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <SentimentForm
-              onAnalyze={handleAnalyze}
-              isAnalyzing={isLoading}
-              result={currentResult}
-              getEmotionColor={getEmotionColor}
-            />
-          </motion.div>
-
-          {/* Right Column - Live Feed */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <EmotionFeed
+            <AdvancedAnalyticsDashboard
               sentiments={sentiments}
               getEmotionColor={getEmotionColor}
               isNegativeEmotion={isNegativeEmotion}
             />
           </motion.div>
-        </div>
+        ) : (
+          /* Standard Dashboard Layout */
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Left Column - Analysis Form */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <SentimentForm
+                onAnalyze={handleAnalyze}
+                isAnalyzing={isLoading}
+                result={currentResult}
+                getEmotionColor={getEmotionColor}
+              />
+            </motion.div>
+
+            {/* Right Column - Live Feed */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <EmotionFeed
+                sentiments={sentiments}
+                getEmotionColor={getEmotionColor}
+                isNegativeEmotion={isNegativeEmotion}
+              />
+            </motion.div>
+          </div>
+        )}
 
         {/* Technical Info */}
         <motion.div

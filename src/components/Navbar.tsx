@@ -26,7 +26,7 @@ export const Navbar = () => {
               <Brain className="h-6 w-6 text-white" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
-              SentimentAI
+              Sentinel Sight
             </span>
           </Link>
 

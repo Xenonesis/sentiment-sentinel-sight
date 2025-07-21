@@ -1,6 +1,6 @@
-# 🤝 Contributing to Customer Sentiment Watchdog
+# 🤝 Contributing to Sentinel Sight
 
-Thank you for your interest in contributing to Customer Sentiment Watchdog! We welcome contributions from developers of all skill levels. This guide will help you get started.
+Thank you for your interest in contributing to Sentinel Sight! We welcome contributions from developers of all skill levels. This guide will help you get started.
 
 ## 📋 Table of Contents
 
@@ -549,10 +549,10 @@ Contributors will be recognized in:
 
 ## 🙏 Thank You
 
-Thank you for contributing to Customer Sentiment Watchdog! Your contributions help make this project better for everyone. Every contribution, no matter how small, is valuable and appreciated.
+Thank you for contributing to Sentinel Sight! Your contributions help make this project better for everyone. Every contribution, no matter how small, is valuable and appreciated.
 
 ---
 
 **Happy Contributing! 🚀**
 
-*Built with ❤️ by the Customer Sentiment Watchdog community*
+*Built with ❤️ by the Sentinel Sight community*
