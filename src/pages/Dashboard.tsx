@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Brain, Activity, AlertCircle } from 'lucide-react';
+import { Brain, Activity, AlertCircle, Settings } from 'lucide-react';
+import { SettingsPage } from '@/components/SettingsPage';
 import { SentimentForm } from '@/components/SentimentForm';
 import { EmotionFeed } from '@/components/EmotionFeed';
 import { LoadingScreen } from '@/components/LoadingScreen';
@@ -8,20 +9,24 @@ import { useSentimentAnalysis, SentimentResult } from '@/hooks/useSentimentAnaly
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 
 export const Dashboard = () => {
   const [sentiments, setSentiments] = useState<SentimentResult[]>([]);
   const [currentResult, setCurrentResult] = useState<SentimentResult | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
   const { toast } = useToast();
 
   const {
     isLoading,
     isModelLoaded,
     error,
+    usingGemini,
     loadModel,
     analyzeSentiment,
     getEmotionColor,
-    isNegativeEmotion
+    isNegativeEmotion,
+    isGeminiConfigured
   } = useSentimentAnalysis();
 
   useEffect(() => {
@@ -67,18 +72,18 @@ export const Dashboard = () => {
   };
 
   // Show loading screen while model is loading
-  if (isLoading && !isModelLoaded) {
+  if (isLoading && !isModelLoaded && !isGeminiConfigured) {
     return <LoadingScreen />;
   }
 
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
+        {/* Header with Settings Button */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center space-y-4"
+          className="flex items-center justify-between"
         >
           <div className="flex items-center justify-center gap-3">
             <div className="p-3 bg-gradient-sentiment rounded-xl shadow-glow">
@@ -93,20 +98,47 @@ export const Dashboard = () => {
               </p>
             </div>
           </div>
-          
-          <div className="flex items-center justify-center gap-4 text-sm">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowSettings(true)}
+            className="flex items-center gap-2"
+          >
+            <Settings className="h-4 w-4" />
+            Settings
+          </Button>
+        </motion.div>
+
+        {/* Status Information */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="flex items-center justify-center gap-6 text-sm flex-wrap"
+        >
+          <div className="flex items-center gap-2">
+            <div className={`h-2 w-2 rounded-full ${isModelLoaded ? 'bg-primary' : 'bg-muted'}`} />
+            <span className={isModelLoaded ? 'text-primary' : 'text-muted-foreground'}>
+              HuggingFace Model {isModelLoaded ? 'Ready' : 'Loading'}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className={`h-2 w-2 rounded-full ${isGeminiConfigured ? 'bg-green-500' : 'bg-yellow-500'}`} />
+            <span className={isGeminiConfigured ? 'text-green-500' : 'text-yellow-500'}>
+              Gemini {isGeminiConfigured ? 'Ready' : 'Not Configured'}
+            </span>
+          </div>
+          {usingGemini && (
             <div className="flex items-center gap-2">
-              <div className={`h-2 w-2 rounded-full ${isModelLoaded ? 'bg-primary' : 'bg-muted'}`} />
-              <span className={isModelLoaded ? 'text-primary' : 'text-muted-foreground'}>
-                AI Model {isModelLoaded ? 'Ready' : 'Loading'}
-              </span>
+              <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+              <span className="text-blue-500">Using Gemini API</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Activity className="h-4 w-4 text-primary" />
-              <span className="text-muted-foreground">
-                {sentiments.length} messages analyzed
-              </span>
-            </div>
+          )}
+          <div className="flex items-center gap-2">
+            <Activity className="h-4 w-4 text-primary" />
+            <span className="text-muted-foreground">
+              {sentiments.length} messages analyzed
+            </span>
           </div>
         </motion.div>
 
@@ -118,7 +150,21 @@ export const Dashboard = () => {
           >
             <Alert className="bg-destructive/10 border-destructive/50">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription>
+                {error}
+                {!isGeminiConfigured && (
+                  <div className="mt-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setShowSettings(true)}
+                      className="ml-2"
+                    >
+                      Configure Gemini API
+                    </Button>
+                  </div>
+                )}
+              </AlertDescription>
             </Alert>
           </motion.div>
         )}
@@ -168,19 +214,24 @@ export const Dashboard = () => {
             <CardContent className="text-xs text-muted-foreground space-y-2">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <span className="font-medium">Model:</span> Xenova/distilbert-base-uncased-finetuned-sst-2-english
+                  <span className="font-medium">Primary Model:</span> Xenova/distilbert-base-uncased-finetuned-sst-2-english
                 </div>
                 <div>
-                  <span className="font-medium">Analysis:</span> Binary sentiment (Positive/Negative)
+                  <span className="font-medium">Fallback:</span> Google Gemini Pro {isGeminiConfigured ? '(Ready)' : '(Not Configured)'}
                 </div>
                 <div>
-                  <span className="font-medium">Processing:</span> Client-side AI with ONNX runtime
+                  <span className="font-medium">Processing:</span> {usingGemini ? 'Cloud AI via Gemini' : 'Client-side ONNX'}
                 </div>
               </div>
             </CardContent>
           </Card>
         </motion.div>
       </div>
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <SettingsPage onClose={() => setShowSettings(false)} />
+      )}
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { pipeline } from '@huggingface/transformers';
+import { analyzeWithGemini, isGeminiConfigured } from '@/services/geminiService';
 
 export interface SentimentResult {
   emotion: string;
@@ -20,6 +21,7 @@ export const useSentimentAnalysis = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [usingGemini, setUsingGemini] = useState(false);
 
   const loadModel = useCallback(async () => {
     if (model) return model;
@@ -58,12 +60,39 @@ export const useSentimentAnalysis = () => {
       throw new Error('Message cannot be empty');
     }
 
-    let currentModel = model;
-    if (!currentModel) {
-      currentModel = await loadModel();
-    }
+    setIsLoading(true);
+    setError(null);
 
     try {
+      // First try HuggingFace model
+      let currentModel = model;
+      if (!currentModel) {
+        try {
+          currentModel = await loadModel();
+        } catch (modelError) {
+          console.warn('HuggingFace model failed to load, trying Gemini fallback...', modelError);
+          
+          // Fallback to Gemini if available
+          if (isGeminiConfigured()) {
+            setUsingGemini(true);
+            const geminiResult = await analyzeWithGemini(message);
+            
+            return {
+              emotion: geminiResult.emotion,
+              confidence: geminiResult.confidence,
+              timestamp: new Date(),
+              message,
+              customerId,
+              channel
+            };
+          } else {
+            throw new Error('HuggingFace model unavailable and Gemini not configured. Please add your Gemini API key in Settings.');
+          }
+        }
+      }
+
+      // Use HuggingFace model
+      setUsingGemini(false);
       const results = await currentModel(message) as EmotionScore[];
       
       // Get the emotion with highest confidence
@@ -80,9 +109,34 @@ export const useSentimentAnalysis = () => {
         channel
       };
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Analysis failed';
-      setError(errorMessage);
-      throw new Error(errorMessage);
+      console.error('Primary analysis failed, trying Gemini fallback...', err);
+      
+      // Final fallback to Gemini
+      if (isGeminiConfigured()) {
+        try {
+          setUsingGemini(true);
+          const geminiResult = await analyzeWithGemini(message);
+          
+          return {
+            emotion: geminiResult.emotion,
+            confidence: geminiResult.confidence,
+            timestamp: new Date(),
+            message,
+            customerId,
+            channel
+          };
+        } catch (geminiError) {
+          const errorMessage = `Both analysis methods failed. HuggingFace: ${err instanceof Error ? err.message : 'Unknown error'}. Gemini: ${geminiError instanceof Error ? geminiError.message : 'Unknown error'}`;
+          setError(errorMessage);
+          throw new Error(errorMessage);
+        }
+      } else {
+        const errorMessage = `Analysis failed and no fallback available. Please configure Gemini API key in Settings. Error: ${err instanceof Error ? err.message : 'Unknown error'}`;
+        setError(errorMessage);
+        throw new Error(errorMessage);
+      }
+    } finally {
+      setIsLoading(false);
     }
   }, [model, loadModel]);
 
@@ -114,9 +168,11 @@ export const useSentimentAnalysis = () => {
     isLoading,
     isModelLoaded,
     error,
+    usingGemini,
     loadModel,
     analyzeSentiment,
     getEmotionColor,
-    isNegativeEmotion
+    isNegativeEmotion,
+    isGeminiConfigured: isGeminiConfigured()
   };
 };
