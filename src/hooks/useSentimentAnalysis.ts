@@ -1,0 +1,122 @@
+import { useState, useCallback } from 'react';
+import { pipeline } from '@huggingface/transformers';
+
+export interface SentimentResult {
+  emotion: string;
+  confidence: number;
+  timestamp: Date;
+  message: string;
+  customerId?: string;
+  channel?: string;
+}
+
+export interface EmotionScore {
+  label: string;
+  score: number;
+}
+
+export const useSentimentAnalysis = () => {
+  const [model, setModel] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isModelLoaded, setIsModelLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadModel = useCallback(async () => {
+    if (model) return model;
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      console.log('Loading emotion classification model...');
+      const emotionPipeline = await pipeline(
+        'text-classification',
+        'j-hartmann/emotion-english-distilroberta-base',
+        {
+          device: 'webgpu'
+        }
+      );
+      
+      setModel(emotionPipeline);
+      setIsModelLoaded(true);
+      console.log('Model loaded successfully!');
+      return emotionPipeline;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load model';
+      setError(errorMessage);
+      console.error('Model loading error:', err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [model]);
+
+  const analyzeSentiment = useCallback(async (
+    message: string,
+    customerId?: string,
+    channel?: string
+  ): Promise<SentimentResult> => {
+    if (!message.trim()) {
+      throw new Error('Message cannot be empty');
+    }
+
+    let currentModel = model;
+    if (!currentModel) {
+      currentModel = await loadModel();
+    }
+
+    try {
+      const results = await currentModel(message) as EmotionScore[];
+      
+      // Get the emotion with highest confidence
+      const topEmotion = results.reduce((prev, current) => 
+        prev.score > current.score ? prev : current
+      );
+
+      return {
+        emotion: topEmotion.label,
+        confidence: topEmotion.score,
+        timestamp: new Date(),
+        message,
+        customerId,
+        channel
+      };
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Analysis failed';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  }, [model, loadModel]);
+
+  const getEmotionColor = useCallback((emotion: string): string => {
+    const emotionColors: Record<string, string> = {
+      joy: 'sentiment-joy',
+      optimism: 'sentiment-optimism',
+      surprise: 'sentiment-surprise',
+      love: 'sentiment-love',
+      anger: 'sentiment-anger',
+      fear: 'sentiment-fear',
+      sadness: 'sentiment-sadness',
+      disgust: 'sentiment-disgust',
+      neutral: 'sentiment-neutral'
+    };
+    
+    return emotionColors[emotion.toLowerCase()] || 'sentiment-neutral';
+  }, []);
+
+  const isNegativeEmotion = useCallback((emotion: string): boolean => {
+    const negativeEmotions = ['anger', 'fear', 'sadness', 'disgust'];
+    return negativeEmotions.includes(emotion.toLowerCase());
+  }, []);
+
+  return {
+    model,
+    isLoading,
+    isModelLoaded,
+    error,
+    loadModel,
+    analyzeSentiment,
+    getEmotionColor,
+    isNegativeEmotion
+  };
+};

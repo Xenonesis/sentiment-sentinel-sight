@@ -1,73 +1,206 @@
-# Welcome to your Lovable project
+# Customer Sentiment Watchdog 🧠
 
-## Project info
+A comprehensive AI-powered customer sentiment analysis tool that monitors and analyzes customer communications in real-time.
 
-**URL**: https://lovable.dev/projects/54a89cc1-9d81-4f89-8a75-b33e628349cb
+## ✨ Features
 
-## How can I edit this code?
+- **Real-time Sentiment Analysis**: Uses HuggingFace's emotion detection model to analyze customer messages
+- **Live Emotion Feed**: Real-time dashboard showing all analyzed messages with confidence scores
+- **Alert System**: Automatically alerts when negative sentiment exceeds 30% threshold
+- **Multi-channel Support**: Track sentiment across email, chat, phone, social media, and reviews
+- **Beautiful UI**: Modern interface built with shadcn/ui, Tailwind CSS, and Framer Motion
+- **Client-side AI**: Runs emotion detection directly in the browser for instant results
 
-There are several ways of editing your application.
+## 🛠️ Tech Stack
 
-**Use Lovable**
+### Frontend (Current Implementation)
+- **Vite + React**: Fast, modern development
+- **TypeScript**: Type-safe development
+- **Tailwind CSS**: Utility-first styling
+- **shadcn/ui**: Beautiful, accessible components
+- **Framer Motion**: Smooth animations
+- **HuggingFace Transformers**: Client-side AI model
+- **Recharts**: Data visualization
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/54a89cc1-9d81-4f89-8a75-b33e628349cb) and start prompting.
+### Backend (Reference Implementation)
+- **FastAPI**: High-performance Python API
+- **Supabase**: PostgreSQL database with real-time capabilities
+- **HuggingFace Transformers**: Server-side emotion detection
+- **PyTorch**: ML model inference
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🚀 Getting Started
 
-**Use your preferred IDE**
+### Frontend Setup (Current)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+1. The app is already running in Lovable! 
+2. Click "Analyze Sentiment" to test with example messages
+3. The AI model will load automatically on first use
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### For Supabase Integration
 
-Follow these steps:
+To enable database storage and backend functionality:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+1. **Connect Supabase**: Click the green Supabase button in Lovable's interface
+2. **Run Database Schema**: Execute the SQL in `backend-reference/supabase-schema.sql`
+3. **Set up RLS policies**: Configure Row Level Security as needed
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Local Backend Setup (Optional)
 
-# Step 3: Install the necessary dependencies.
-npm i
+```bash
+# Clone and setup backend
+cd backend-reference
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Set environment variables
+export SUPABASE_URL="your-supabase-url"
+export SUPABASE_ANON_KEY="your-supabase-anon-key"
+
+# Run the FastAPI server
+python main.py
 ```
 
-**Edit a file directly in GitHub**
+## 📊 Emotion Detection
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+The system detects 8 different emotions:
 
-**Use GitHub Codespaces**
+- **Positive**: Joy, Love, Optimism, Surprise
+- **Negative**: Anger, Fear, Sadness, Disgust
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Model Details
+- **Model**: `j-hartmann/emotion-english-distilroberta-base`
+- **Accuracy**: High performance on English text
+- **Processing**: Client-side with WebGPU acceleration
+- **Fallback**: WASM for broader browser compatibility
 
-## What technologies are used for this project?
+## 🎯 Key Features Explained
 
-This project is built with:
+### Real-time Analysis
+- Instant emotion detection as you type
+- Confidence scores for each prediction
+- Color-coded emotion badges
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Alert System
+- Monitors last 10 messages for negative sentiment
+- Triggers visual alert at 30% negative threshold
+- Toast notifications for high-confidence detections
 
-## How can I deploy this project?
+### Analytics Dashboard
+- Total message count
+- Negative sentiment percentage
+- Top emotion distribution
+- Historical message feed
 
-Simply open [Lovable](https://lovable.dev/projects/54a89cc1-9d81-4f89-8a75-b33e628349cb) and click on Share -> Publish.
+## 🔧 API Endpoints (Backend Reference)
 
-## Can I connect a custom domain to my Lovable project?
+```bash
+POST /analyze
+# Analyze message sentiment
+{
+  "message": "I love this product!",
+  "customer_id": "CUST_001",
+  "channel": "email"
+}
 
-Yes, you can!
+GET /sentiments?limit=100
+# Get recent sentiment analysis results
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+GET /analytics
+# Get sentiment statistics and trends
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+GET /health
+# Health check endpoint
+```
+
+## 📈 Database Schema
+
+The Supabase database includes:
+
+- `sentiment_analysis` table for storing all analyses
+- Indexes for performance optimization
+- Analytics views for reporting
+- RLS policies for security
+- Helper functions for trend analysis
+
+## 🎨 Design System
+
+The app uses a custom design system with:
+
+- **Color Palette**: Emotion-specific colors for each sentiment
+- **Dark Theme**: Professional dark UI optimized for monitoring
+- **Gradients**: Beautiful gradient backgrounds and effects
+- **Animations**: Smooth Framer Motion transitions
+- **Responsive**: Mobile-first design approach
+
+## 🔐 Security Features
+
+- Row Level Security (RLS) on Supabase
+- Input validation and sanitization
+- CORS protection
+- Error handling and logging
+
+## 📝 Usage Examples
+
+### Analyze Customer Feedback
+```
+Input: "The customer support was terrible and I'm very frustrated with this experience!"
+Output: Emotion: ANGER, Confidence: 94.2%
+```
+
+### Monitor Social Media
+```
+Input: "I absolutely love your new product! Amazing work!"
+Output: Emotion: JOY, Confidence: 96.8%
+```
+
+### Track Support Tickets
+```
+Input: "I'm confused about how to use this feature. Can someone help?"
+Output: Emotion: FEAR, Confidence: 67.3%
+```
+
+## 🚀 Deployment Options
+
+### Frontend
+- **Lovable**: Already deployed and running
+- **Vercel**: Easy deployment for React apps
+- **Netlify**: Static site hosting
+
+### Backend
+- **Render**: Free tier available for FastAPI
+- **Railway**: Simple Python deployment
+- **Google Cloud Run**: Serverless container hosting
+
+## 🎯 Future Enhancements
+
+- [ ] Sentiment trend charts
+- [ ] Customer sentiment profiles
+- [ ] Integration with popular CRM systems
+- [ ] Multi-language support
+- [ ] Sentiment-based auto-routing
+- [ ] Advanced analytics and reporting
+- [ ] Webhook notifications
+- [ ] Bulk message processing
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is open source and available under the MIT License.
+
+## 🆘 Support
+
+- Check the troubleshooting section below
+- Review the API documentation
+- Test with example messages first
+
+---
+
+**Built with ❤️ using Lovable, React, and HuggingFace Transformers**

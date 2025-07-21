@@ -52,6 +52,17 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				sentiment: {
+					joy: 'hsl(var(--joy))',
+					optimism: 'hsl(var(--optimism))',
+					surprise: 'hsl(var(--surprise))',
+					love: 'hsl(var(--love))',
+					anger: 'hsl(var(--anger))',
+					fear: 'hsl(var(--fear))',
+					sadness: 'hsl(var(--sadness))',
+					disgust: 'hsl(var(--disgust))',
+					neutral: 'hsl(var(--neutral))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -67,6 +78,15 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			backgroundImage: {
+				'gradient-sentiment': 'var(--gradient-sentiment)',
+				'gradient-card': 'var(--gradient-card)',
+				'gradient-alert': 'var(--gradient-alert)'
+			},
+			boxShadow: {
+				'glow': 'var(--shadow-glow)',
+				'card': 'var(--shadow-card)'
 			},
 			keyframes: {
 				'accordion-down': {
