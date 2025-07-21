@@ -217,7 +217,7 @@ export const Dashboard = () => {
                   <span className="font-medium">Primary Model:</span> Xenova/distilbert-base-uncased-finetuned-sst-2-english
                 </div>
                 <div>
-                  <span className="font-medium">Fallback:</span> Google Gemini Pro {isGeminiConfigured ? '(Ready)' : '(Not Configured)'}
+                  <span className="font-medium">Fallback:</span> Google Gemini 2.0 Flash {isGeminiConfigured ? '(Ready)' : '(Not Configured)'}
                 </div>
                 <div>
                   <span className="font-medium">Processing:</span> {usingGemini ? 'Cloud AI via Gemini' : 'Client-side ONNX'}

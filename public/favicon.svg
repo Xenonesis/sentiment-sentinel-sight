@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <title>Skull Favicon</title>
+  <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <!-- Skull base -->
+    <path d="M16,2 C9.373,2 4,7.373 4,14 C4,17.585 5.613,20.774 8.127,22.853 C8.042,23.23 8,23.614 8,24 L8,26 C8,28.209 9.791,30 12,30 L20,30 C22.209,30 24,28.209 24,26 L24,24 C24,23.614 23.958,23.23 23.873,22.853 C26.387,20.774 28,17.585 28,14 C28,7.373 22.627,2 16,2 Z" fill="#1A1A1A"></path>
+    
+    <!-- Eye sockets - more angular and menacing -->
+    <path d="M11,11 L8,13 L8,16 L11,18 L14,16 L14,13 L11,11 Z" fill="#000000"></path>
+    <path d="M21,11 L18,13 L18,16 L21,18 L24,16 L24,13 L21,11 Z" fill="#000000"></path>
+    
+    <!-- Eye highlights -->
+    <circle fill="#444444" cx="11" cy="14.5" r="1.5"></circle>
+    <circle fill="#444444" cx="21" cy="14.5" r="1.5"></circle>
+    
+    <!-- Nasal cavity -->
+    <path d="M16,16 L14,19 L18,19 L16,16 Z" fill="#000000"></path>
+    
+    <!-- Teeth - jagged and menacing -->
+    <path d="M12,22 L12,26 L13,24 L14,26 L15,24 L16,26 L17,24 L18,26 L19,24 L20,26 L20,22 Z" fill="#FFFFFF"></path>
+    
+    <!-- Cranium details -->
+    <path d="M16,4 C11.582,4 8,7.582 8,12 L9,12 C9,8.134 12.134,5 16,5 C19.866,5 23,8.134 23,12 L24,12 C24,7.582 20.418,4 16,4 Z" fill="#333333"></path>
+    
+    <!-- Jaw line -->
+    <path d="M10,20 L10,22 L22,22 L22,20" stroke="#333333" stroke-width="1"></path>
+  </g>
+</svg>

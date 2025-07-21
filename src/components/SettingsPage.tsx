@@ -36,7 +36,7 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
 
     setIsTestingKey(true);
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -135,7 +135,7 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
               <Alert className="bg-muted/30 border-border/50">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  Enter your Google Gemini API key to enable sentiment analysis when HuggingFace models are unavailable. 
+                  Enter your Google Gemini API key to enable sentiment analysis with Gemini 2.0 Flash when HuggingFace models are unavailable. 
                   Get your free API key at <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google AI Studio</a>.
                 </AlertDescription>
               </Alert>
@@ -208,7 +208,7 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
                   <span className="text-primary">Available</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Gemini Fallback:</span>
+                  <span className="text-muted-foreground">Gemini 2.0 Flash:</span>
                   <span className={keyStatus === 'valid' ? 'text-green-500' : 'text-muted-foreground'}>
                     {keyStatus === 'valid' ? 'Configured' : 'Not configured'}
                   </span>
@@ -221,8 +221,8 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
               <h3 className="font-semibold">How it works</h3>
               <div className="text-sm text-muted-foreground space-y-2">
                 <p>1. The app first tries to use the HuggingFace model for sentiment analysis</p>
-                <p>2. If that fails, it automatically falls back to Google Gemini (if configured)</p>
-                <p>3. Gemini provides detailed emotion analysis similar to the original model</p>
+                <p>2. If that fails, it automatically falls back to Google Gemini 2.0 Flash (if configured)</p>
+                <p>3. Gemini 2.0 Flash provides detailed emotion analysis similar to the original model</p>
               </div>
             </div>
           </CardContent>

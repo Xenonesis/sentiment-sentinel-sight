@@ -21,10 +21,10 @@ export const analyzeWithGemini = async (message: string): Promise<GeminiSentimen
 
 Customer message: "${message}"
 
-Important: Respond with only the JSON object, no other text.`;
+Important: Respond with only the JSON object, no other text. Do not include any markdown formatting or additional text outside the JSON.`;
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
