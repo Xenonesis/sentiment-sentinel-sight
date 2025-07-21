@@ -30,10 +30,10 @@ export const SentimentForm = ({ onAnalyze, isAnalyzing, result, getEmotionColor 
   };
 
   const exampleMessages = [
-    "I love this product! It's amazing!",
-    "This service is terrible and I'm very frustrated",
-    "I'm confused about how this works",
-    "Thank you so much for your help today!"
+    "I love this product! It's amazing and works perfectly!",
+    "This service is terrible and I'm very frustrated with the experience",
+    "The support team was helpful but the product needs improvement", 
+    "Thank you so much for your quick response and excellent service!"
   ];
 
   const setExampleMessage = (exampleMessage: string) => {

@@ -168,13 +168,13 @@ export const Dashboard = () => {
             <CardContent className="text-xs text-muted-foreground space-y-2">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <span className="font-medium">Model:</span> j-hartmann/emotion-english-distilroberta-base
+                  <span className="font-medium">Model:</span> Xenova/distilbert-base-uncased-finetuned-sst-2-english
                 </div>
                 <div>
-                  <span className="font-medium">Emotions:</span> Joy, Anger, Fear, Sadness, Surprise, Disgust, Love
+                  <span className="font-medium">Analysis:</span> Binary sentiment (Positive/Negative)
                 </div>
                 <div>
-                  <span className="font-medium">Processing:</span> Client-side AI with WebGPU acceleration
+                  <span className="font-medium">Processing:</span> Client-side AI with ONNX runtime
                 </div>
               </div>
             </CardContent>

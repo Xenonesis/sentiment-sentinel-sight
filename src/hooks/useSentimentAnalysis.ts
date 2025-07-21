@@ -29,12 +29,10 @@ export const useSentimentAnalysis = () => {
     
     try {
       console.log('Loading emotion classification model...');
+      // Try a model that definitely has ONNX support
       const emotionPipeline = await pipeline(
         'text-classification',
-        'j-hartmann/emotion-english-distilroberta-base',
-        {
-          device: 'webgpu'
-        }
+        'Xenova/distilbert-base-uncased-finetuned-sst-2-english'
       );
       
       setModel(emotionPipeline);
@@ -90,6 +88,8 @@ export const useSentimentAnalysis = () => {
 
   const getEmotionColor = useCallback((emotion: string): string => {
     const emotionColors: Record<string, string> = {
+      positive: 'sentiment-joy',
+      negative: 'sentiment-anger',
       joy: 'sentiment-joy',
       optimism: 'sentiment-optimism',
       surprise: 'sentiment-surprise',
@@ -105,7 +105,7 @@ export const useSentimentAnalysis = () => {
   }, []);
 
   const isNegativeEmotion = useCallback((emotion: string): boolean => {
-    const negativeEmotions = ['anger', 'fear', 'sadness', 'disgust'];
+    const negativeEmotions = ['negative', 'anger', 'fear', 'sadness', 'disgust'];
     return negativeEmotions.includes(emotion.toLowerCase());
   }, []);
 

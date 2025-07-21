@@ -61,18 +61,18 @@ export SUPABASE_ANON_KEY="your-supabase-anon-key"
 python main.py
 ```
 
-## 📊 Emotion Detection
+## 📊 Sentiment Detection
 
-The system detects 8 different emotions:
+The system uses a high-performance DistilBERT model for binary sentiment analysis:
 
-- **Positive**: Joy, Love, Optimism, Surprise
-- **Negative**: Anger, Fear, Sadness, Disgust
+- **Positive**: Joy, satisfaction, appreciation, love
+- **Negative**: Anger, frustration, disappointment, criticism
 
 ### Model Details
-- **Model**: `j-hartmann/emotion-english-distilroberta-base`
-- **Accuracy**: High performance on English text
-- **Processing**: Client-side with WebGPU acceleration
-- **Fallback**: WASM for broader browser compatibility
+- **Model**: `Xenova/distilbert-base-uncased-finetuned-sst-2-english`
+- **Accuracy**: Stanford Sentiment Treebank trained model
+- **Processing**: Client-side with ONNX runtime
+- **Compatibility**: Optimized for browser inference
 
 ## 🎯 Key Features Explained
 
