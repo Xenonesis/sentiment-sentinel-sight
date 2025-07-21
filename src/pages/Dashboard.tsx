@@ -1,23 +1,30 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Brain, Activity, AlertCircle, Settings, Info } from 'lucide-react';
+import { Brain, Activity, AlertCircle, Settings, Info, Download, Trash2, Database } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SettingsPage } from '@/components/SettingsPage';
 import { SentimentForm } from '@/components/SentimentForm';
 import { EmotionFeed } from '@/components/EmotionFeed';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import { ExportModal } from '@/components/ExportModal';
 import { useSentimentAnalysis, SentimentResult } from '@/hooks/useSentimentAnalysis';
+import { usePersistedSentiments } from '@/hooks/usePersistedSentiments';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 export const Dashboard = () => {
-  const [sentiments, setSentiments] = useState<SentimentResult[]>([]);
   const [currentResult, setCurrentResult] = useState<SentimentResult | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Use persisted sentiments instead of regular state
+  const { sentiments, addSentiment, clearHistory, getStorageInfo } = usePersistedSentiments();
 
   const {
     isLoading,
@@ -46,7 +53,7 @@ export const Dashboard = () => {
     try {
       const result = await analyzeSentiment(message, customerId, channel);
       setCurrentResult(result);
-      setSentiments(prev => [...prev, result]);
+      addSentiment(result);
       
       // Show toast notification for high-confidence negative emotions
       if (isNegativeEmotion(result.emotion) && result.confidence > 0.8) {
@@ -81,7 +88,7 @@ export const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header with Settings Button */}
+        {/* Header with Action Buttons */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -100,15 +107,25 @@ export const Dashboard = () => {
               </p>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowSettings(true)}
-            className="flex items-center gap-2"
-          >
-            <Settings className="h-4 w-4" />
-            Settings
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setShowExportModal(true)}
+              disabled={sentiments.length === 0}
+              className="flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Export
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowSettings(true)}
+              className="flex items-center gap-2"
+            >
+              <Settings className="h-4 w-4" />
+              Settings
+            </Button>
+          </div>
         </motion.div>
 
         {/* Status Information */}
@@ -216,13 +233,16 @@ export const Dashboard = () => {
             <CardContent className="text-xs text-muted-foreground space-y-2">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <span className="font-medium">Primary Model:</span> Xenova/distilbert-base-uncased-finetuned-sst-2-english
+                  <span className="font-medium">Primary Model:</span>
+                  <div className="text-xs mt-1">Xenova/distilbert-base-uncased-finetuned-sst-2-english</div>
                 </div>
                 <div>
-                  <span className="font-medium">Fallback:</span> Google Gemini 2.0 Flash {isGeminiConfigured ? '(Ready)' : '(Not Configured)'}
+                  <span className="font-medium">Fallback:</span>
+                  <div className="text-xs mt-1">Google Gemini 2.0 Flash {isGeminiConfigured ? '(Ready)' : '(Not Configured)'}</div>
                 </div>
                 <div>
-                  <span className="font-medium">Processing:</span> {usingGemini ? 'Cloud AI via Gemini' : 'Client-side ONNX'}
+                  <span className="font-medium">Processing:</span>
+                  <div className="text-xs mt-1">{usingGemini ? 'Cloud AI via Gemini' : 'Client-side ONNX'}</div>
                 </div>
               </div>
             </CardContent>
@@ -230,9 +250,18 @@ export const Dashboard = () => {
         </motion.div>
       </div>
 
-      {/* Settings Modal */}
+      {/* Modals */}
       {showSettings && (
         <SettingsPage onClose={() => setShowSettings(false)} />
+      )}
+      
+      {showExportModal && (
+        <ExportModal
+          isOpen={showExportModal}
+          onClose={() => setShowExportModal(false)}
+          sentiments={sentiments}
+          getEmotionColor={getEmotionColor}
+        />
       )}
     </div>
   );
