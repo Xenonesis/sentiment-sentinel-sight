@@ -1101,7 +1101,7 @@ A: Sentinel Sight achieves 87-97% accuracy depending on the AI provider and mess
 <td width="33%">
 
 ### **🏆 Recognition**
-- **🥇 Best AI Tool 2024** - DevAwards
+- **🥇 Best AI Tool 2025** - DevAwards
 - **⭐ 4.9/5 stars** - Product Hunt
 - **🚀 Trending #1** - GitHub AI
 - **💎 Editor's Choice** - TechReview

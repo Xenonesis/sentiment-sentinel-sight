@@ -11,7 +11,7 @@ export const usePersistedSentiments = () => {
       if (saved) {
         const parsed = JSON.parse(saved);
         // Convert timestamp strings back to Date objects
-        return parsed.map((item: any) => ({
+        return parsed.map((item: SentimentResult & { timestamp: string }) => ({
           ...item,
           timestamp: new Date(item.timestamp)
         }));

@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { pipeline } from '@huggingface/transformers';
 import { analyzeWithGemini, isGeminiConfigured } from '@/services/geminiService';
+import { useRetry } from './useRetry';
 
 export interface SentimentResult {
   emotion: string;
@@ -17,7 +18,7 @@ export interface EmotionScore {
 }
 
 export const useSentimentAnalysis = () => {
-  const [model, setModel] = useState<any>(null);
+  const [model, setModel] = useState<((text: string) => Promise<EmotionScore[]>) | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);

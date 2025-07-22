@@ -292,7 +292,7 @@ export const AdvancedAnalyticsDashboard = ({
     title: string;
     value: number;
     change?: number;
-    icon: any;
+    icon: React.ComponentType<{ className?: string }>;
     trend?: 'up' | 'down' | 'stable';
     format?: 'number' | 'percentage' | 'decimal';
   }) => (

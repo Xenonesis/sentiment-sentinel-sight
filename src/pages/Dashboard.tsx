@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Brain, Activity, AlertCircle, Settings, Info, Download, Trash2, Database, BarChart3 } from 'lucide-react';
+import { Brain, Activity, AlertCircle, Settings, Info, Download, Trash2, Database, BarChart3, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SettingsPage } from '@/components/SettingsPage';
 import { SentimentForm } from '@/components/SentimentForm';
@@ -9,6 +9,7 @@ import { LoadingScreen } from '@/components/LoadingScreen';
 import { ExportModal } from '@/components/ExportModal';
 import { BulkAnalysisModal } from '@/components/BulkAnalysisModal';
 import { AdvancedAnalyticsDashboard } from '@/components/AdvancedAnalyticsDashboard';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useSentimentAnalysis, SentimentResult } from '@/hooks/useSentimentAnalysis';
 import { usePersistedSentiments } from '@/hooks/usePersistedSentiments';
 import { useToast } from '@/hooks/use-toast';
@@ -104,7 +105,8 @@ export const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <ErrorBoundary>
+      <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header with Action Buttons */}
         <motion.div
@@ -312,5 +314,6 @@ export const Dashboard = () => {
         />
       )}
     </div>
+    </ErrorBoundary>
   );
 };

@@ -84,12 +84,19 @@ export const SentimentTrendsChart = ({ sentiments, getEmotionColor }: SentimentT
       }
 
       return acc;
-    }, {} as Record<string, any>);
+    }, {} as Record<string, {
+      timestamp: Date;
+      time: string;
+      positive: number;
+      negative: number;
+      neutral: number;
+      count: number;
+    }>);
 
     // Convert to array and sort by timestamp
     return Object.values(groupedData)
-      .sort((a: any, b: any) => a.timestamp.getTime() - b.timestamp.getTime())
-      .map((item: any) => ({
+      .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
+      .map((item) => ({
         time: item.time,
         positive: item.positive,
         negative: item.negative,
@@ -123,7 +130,16 @@ export const SentimentTrendsChart = ({ sentiments, getEmotionColor }: SentimentT
     };
   }, [chartData]);
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: {
+    active?: boolean;
+    payload?: Array<{
+      value: number;
+      dataKey: string;
+      color: string;
+      payload: Record<string, unknown>;
+    }>;
+    label?: string;
+  }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (

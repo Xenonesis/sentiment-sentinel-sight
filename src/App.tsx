@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { Navbar } from "@/components/Navbar";
-import { StackedCircularFooter } from "@/components/ui/stacked-circular-footer";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -35,7 +34,9 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
-            <StackedCircularFooter />
+            <footer className="p-4 text-center">
+              © 2025 Sentiment Sentinel
+            </footer>
           </div>
         </BrowserRouter>
       </TooltipProvider>
