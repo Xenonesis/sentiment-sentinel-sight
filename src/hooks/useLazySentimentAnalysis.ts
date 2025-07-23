@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { logger } from '@/utils/logger';
 import { analyzeWithGemini, isGeminiConfigured } from '@/services/geminiService';
 import { useRetry } from './useRetry';
 
@@ -24,19 +25,19 @@ export const useLazySentimentAnalysis = () => {
   // Lazy load the transformers library only when needed
   const loadTransformersModel = useCallback(async () => {
     try {
-      console.log('Dynamically loading transformers library...');
+      logger.log('Dynamically loading transformers library...');
       const { pipeline } = await import('@huggingface/transformers');
       
-      console.log('Loading emotion classification model...');
+      logger.log('Loading emotion classification model...');
       const emotionPipeline = await pipeline(
         'text-classification',
         'Xenova/distilbert-base-uncased-finetuned-sst-2-english'
       );
       
-      console.log('Model loaded successfully!');
+      logger.log('Model loaded successfully!');
       return emotionPipeline;
     } catch (err) {
-      console.error('Model loading error:', err);
+      logger.error('Model loading error:', err);
       throw err;
     }
   }, []);
@@ -69,7 +70,7 @@ export const useLazySentimentAnalysis = () => {
             channel
           };
         } catch (geminiError) {
-          console.warn('Gemini analysis failed, falling back to local model...', geminiError);
+          logger.warn('Gemini analysis failed, falling back to local model...', geminiError);
         }
       }
 

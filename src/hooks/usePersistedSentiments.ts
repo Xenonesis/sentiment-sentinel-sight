@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { SentimentResult } from './useSentimentAnalysis';
+import { logger } from '@/utils/logger';
 
 const STORAGE_KEY = 'sentiment-history';
 const MAX_STORED_ITEMS = 1000; // Prevent localStorage from getting too large
@@ -17,7 +18,7 @@ export const usePersistedSentiments = () => {
         }));
       }
     } catch (error) {
-      console.error('Failed to load sentiment history from localStorage:', error);
+      logger.error('Failed to load sentiment history from localStorage:', error);
     }
     return [];
   });
@@ -29,13 +30,13 @@ export const usePersistedSentiments = () => {
       const itemsToStore = sentiments.slice(-MAX_STORED_ITEMS);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(itemsToStore));
     } catch (error) {
-      console.error('Failed to save sentiment history to localStorage:', error);
+      logger.error('Failed to save sentiment history to localStorage:', error);
       // If storage is full, try to clear old data and save again
       try {
         const recentItems = sentiments.slice(-500); // Keep only 500 most recent
         localStorage.setItem(STORAGE_KEY, JSON.stringify(recentItems));
       } catch (retryError) {
-        console.error('Failed to save even reduced sentiment history:', retryError);
+        logger.error('Failed to save even reduced sentiment history:', retryError);
       }
     }
   }, [sentiments]);

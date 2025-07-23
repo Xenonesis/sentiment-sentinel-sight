@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { SentimentResult } from './useSentimentAnalysis';
+import { logger } from '@/utils/logger';
 
 export interface BulkAnalysisStats {
   totalProcessed: number;
@@ -61,7 +62,7 @@ export const useBulkAnalysis = () => {
         const result = await analyzeFunction(message, customerId, channel);
         results.push(result);
       } catch (error) {
-        console.error(`Failed to analyze message ${i + 1}:`, error);
+        logger.error(`Failed to analyze message ${i + 1}:`, error);
         errorCount++;
       }
 

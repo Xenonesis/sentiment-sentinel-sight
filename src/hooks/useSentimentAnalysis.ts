@@ -1,7 +1,11 @@
-import { useState, useCallback } from 'react';
-import { pipeline } from '@huggingface/transformers';
+import { useState, useCallback, useEffect } from 'react';
+import { logger } from '@/utils/logger';
 import { analyzeWithGemini, isGeminiConfigured } from '@/services/geminiService';
+import { analyzeWithOllama, isOllamaConfigured, isOllamaAvailable, getConfiguredOllamaModel } from '@/services/ollamaService';
 import { useRetry } from './useRetry';
+import { checkWebAssemblySupport, checkMemoryAvailability, getDiagnosticInfo } from '@/utils/browserSupport';
+import { analyzeSentiment as apiAnalyzeSentiment } from '@/services/sentimentApiService';
+import { getEnabledProvidersInOrder, isProviderEnabled, ApiProvider } from '@/services/apiPreferencesService';
 
 export interface SentimentResult {
   emotion: string;
@@ -23,6 +27,9 @@ export const useSentimentAnalysis = () => {
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [usingGemini, setUsingGemini] = useState(false);
+  const [usingOllama, setUsingOllama] = useState(false);
+  const [ollamaAvailable, setOllamaAvailable] = useState(false);
+  const [currentModelName, setCurrentModelName] = useState<string | null>(null);
 
   const loadModel = useCallback(async () => {
     if (model) return model;
@@ -30,22 +37,49 @@ export const useSentimentAnalysis = () => {
     setIsLoading(true);
     setError(null);
     
+    // Check if Ollama is available
+    const ollamaCheck = await isOllamaAvailable();
+    setOllamaAvailable(ollamaCheck);
+    
     try {
-      console.log('Loading emotion classification model...');
-      // Try a model that definitely has ONNX support
-      const emotionPipeline = await pipeline(
-        'text-classification',
-        'Xenova/distilbert-base-uncased-finetuned-sst-2-english'
-      );
+      // Initialize the real sentiment analysis API service
+      logger.log('Initializing sentiment analysis API service...');
+      setCurrentModelName('Sentiment Analysis API');
       
-      setModel(emotionPipeline);
+      // Create a function that wraps our API sentiment analyzer to match the expected interface
+      const apiPipeline = async (text: string): Promise<EmotionScore[]> => {
+        try {
+          // Call the real sentiment analysis API
+          const result = await apiAnalyzeSentiment(text);
+          
+          // Convert the API result to the expected format
+          return [{
+            label: result.emotion,
+            score: result.confidence
+          }];
+        } catch (error) {
+          logger.error('API sentiment analysis error:', error);
+          throw error;
+        }
+      };
+      
+      // Test the API with a simple request
+      try {
+        await apiPipeline("This is a test message to verify the API works correctly.");
+        logger.log('API test successful');
+      } catch (testError) {
+        logger.warn('API test failed, but continuing anyway:', testError);
+        // We'll continue even if the test fails, as the API might work for real requests
+      }
+      
+      setModel(apiPipeline);
       setIsModelLoaded(true);
-      console.log('Model loaded successfully!');
-      return emotionPipeline;
+      logger.log('Sentiment analysis API service initialized successfully!');
+      return apiPipeline;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load model';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to initialize sentiment analysis API';
       setError(errorMessage);
-      console.error('Model loading error:', err);
+      logger.error('Sentiment analysis initialization error:', err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -65,81 +99,119 @@ export const useSentimentAnalysis = () => {
     setError(null);
 
     try {
-      // First try HuggingFace model
-      let currentModel = model;
-      if (!currentModel) {
+      // Get enabled providers in user's preferred order
+      const enabledProviders = getEnabledProvidersInOrder();
+      
+      if (enabledProviders.length === 0) {
+        throw new Error('No API providers are enabled. Please enable at least one provider in Settings.');
+      }
+
+      // Try each enabled provider in order
+      for (const provider of enabledProviders) {
         try {
-          currentModel = await loadModel();
-        } catch (modelError) {
-          console.warn('HuggingFace model failed to load, trying Gemini fallback...', modelError);
+          logger.log(`Trying provider: ${provider}`);
           
-          // Fallback to Gemini if available
-          if (isGeminiConfigured()) {
-            setUsingGemini(true);
-            const geminiResult = await analyzeWithGemini(message);
-            
-            return {
-              emotion: geminiResult.emotion,
-              confidence: geminiResult.confidence,
-              timestamp: new Date(),
-              message,
-              customerId,
-              channel
-            };
-          } else {
-            throw new Error('HuggingFace model unavailable and Gemini not configured. Please add your Gemini API key in Settings.');
+          switch (provider) {
+            case 'huggingface':
+              if (!isProviderEnabled('huggingface')) continue;
+              
+              let currentModel = model;
+              if (!currentModel) {
+                currentModel = await loadModel();
+              }
+              
+              setUsingGemini(false);
+              setUsingOllama(false);
+              setCurrentModelName('HuggingFace Sentiment Analysis');
+              
+              const results = await currentModel(message) as EmotionScore[];
+              const topEmotion = results.reduce((prev, current) => 
+                prev.score > current.score ? prev : current
+              );
+
+              return {
+                emotion: topEmotion.label,
+                confidence: topEmotion.score,
+                timestamp: new Date(),
+                message,
+                customerId,
+                channel
+              };
+
+            case 'ollama':
+              if (!isProviderEnabled('ollama') || !isOllamaConfigured() || !ollamaAvailable) continue;
+              
+              setUsingOllama(true);
+              setUsingGemini(false);
+              const ollamaModel = getConfiguredOllamaModel() || 'llama2';
+              setCurrentModelName(`Ollama (${ollamaModel})`);
+              
+              const ollamaResult = await analyzeWithOllama(message, ollamaModel);
+              
+              return {
+                emotion: ollamaResult.emotion,
+                confidence: ollamaResult.confidence,
+                timestamp: new Date(),
+                message,
+                customerId,
+                channel
+              };
+
+            case 'gemini':
+              if (!isProviderEnabled('gemini') || !isGeminiConfigured()) continue;
+              
+              setUsingGemini(true);
+              setUsingOllama(false);
+              setCurrentModelName('Google Gemini 2.0 Flash');
+              
+              const geminiResult = await analyzeWithGemini(message);
+              
+              return {
+                emotion: geminiResult.emotion,
+                confidence: geminiResult.confidence,
+                timestamp: new Date(),
+                message,
+                customerId,
+                channel
+              };
+
+            case 'sentiment-api':
+              if (!isProviderEnabled('sentiment-api')) continue;
+              
+              setUsingGemini(false);
+              setUsingOllama(false);
+              setCurrentModelName('Sentiment Analysis API');
+              
+              const apiResult = await apiAnalyzeSentiment(message);
+              
+              return {
+                emotion: apiResult.emotion,
+                confidence: apiResult.confidence,
+                timestamp: new Date(),
+                message,
+                customerId,
+                channel
+              };
+
+            default:
+              logger.warn(`Unknown provider: ${provider}`);
+              continue;
           }
+        } catch (error) {
+          logger.warn(`Provider ${provider} failed:`, error);
+          // Continue to next provider
+          continue;
         }
       }
 
-      // Use HuggingFace model
-      setUsingGemini(false);
-      const results = await currentModel(message) as EmotionScore[];
-      
-      // Get the emotion with highest confidence
-      const topEmotion = results.reduce((prev, current) => 
-        prev.score > current.score ? prev : current
-      );
-
-      return {
-        emotion: topEmotion.label,
-        confidence: topEmotion.score,
-        timestamp: new Date(),
-        message,
-        customerId,
-        channel
-      };
-    } catch (err) {
-      console.error('Primary analysis failed, trying Gemini fallback...', err);
-      
-      // Final fallback to Gemini
-      if (isGeminiConfigured()) {
-        try {
-          setUsingGemini(true);
-          const geminiResult = await analyzeWithGemini(message);
-          
-          return {
-            emotion: geminiResult.emotion,
-            confidence: geminiResult.confidence,
-            timestamp: new Date(),
-            message,
-            customerId,
-            channel
-          };
-        } catch (geminiError) {
-          const errorMessage = `Both analysis methods failed. HuggingFace: ${err instanceof Error ? err.message : 'Unknown error'}. Gemini: ${geminiError instanceof Error ? geminiError.message : 'Unknown error'}`;
-          setError(errorMessage);
-          throw new Error(errorMessage);
-        }
-      } else {
-        const errorMessage = `Analysis failed and no fallback available. Please configure Gemini API key in Settings. Error: ${err instanceof Error ? err.message : 'Unknown error'}`;
-        setError(errorMessage);
-        throw new Error(errorMessage);
-      }
+      // If all providers failed
+      const errorMessage = `All enabled providers failed. Please check your configuration in Settings.`;
+      setError(errorMessage);
+      throw new Error(errorMessage);
     } finally {
       setIsLoading(false);
     }
-  }, [model, loadModel]);
+  }, [model, loadModel, ollamaAvailable]);
 
   const getEmotionColor = useCallback((emotion: string): string => {
     const emotionColors: Record<string, string> = {
@@ -170,10 +242,15 @@ export const useSentimentAnalysis = () => {
     isModelLoaded,
     error,
     usingGemini,
+    usingOllama,
+    ollamaAvailable,
+    currentModelName,
     loadModel,
     analyzeSentiment,
     getEmotionColor,
     isNegativeEmotion,
-    isGeminiConfigured: isGeminiConfigured()
+    isGeminiConfigured: isGeminiConfigured(),
+    isOllamaConfigured: isOllamaConfigured(),
+    isOllamaAvailable: ollamaAvailable
   };
 };

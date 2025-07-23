@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
+import { logger } from '@/utils/logger';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, FileText, AlertCircle, CheckCircle, X, Download, Loader2, Database } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -179,7 +180,7 @@ export const BulkAnalysisModal = ({ onAnalyze, onBulkComplete, isAnalyzing }: Bu
         });
       }
     } catch (error) {
-      console.error('Bulk analysis error:', error);
+      logger.error('Bulk analysis error:', error);
       toast({
         title: "Bulk Analysis Error",
         description: "An error occurred during bulk analysis. Please try again.",

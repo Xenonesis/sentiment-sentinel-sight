@@ -5,7 +5,8 @@ All notable changes to the Sentiment Sentinel Sight project will be documented i
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+
+## [0.90.0] - 2025-07-23
 
 ### Changed
 - Updated copyright year from 2024 to 2025 across all files
@@ -291,3 +292,6 @@ Please use conventional commits:
 3. Create release tag
 4. Generate release notes from changelog
 5. Deploy to production
+
+
+This website uses Hugging Face models for sentiment analysis. Specifically, it uses the @huggingface/transformers library to load a text-classification model: Xenova/distilbert-base-uncased-finetuned-sst-2-english. The model is loaded and used within the useSentimentAnalysis hook. If the Hugging Face model fails to load or if the Gemini API is configured, the website falls back to using the Google Gemini API for sentiment analysis. The Gemini API is called via the analyzeWithGemini function in src/services/geminiService.ts.

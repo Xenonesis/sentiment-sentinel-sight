@@ -31,7 +31,7 @@ export const EmotionFeed = ({ sentiments, getEmotionColor, isNegativeEmotion }: 
   )[0];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Alert for High Negative Sentiment */}
       <AnimatePresence>
         {showAlert && (
@@ -51,41 +51,41 @@ export const EmotionFeed = ({ sentiments, getEmotionColor, isNegativeEmotion }: 
       </AnimatePresence>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         <Card className="bg-gradient-card border-border/50">
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total Messages</p>
-                <p className="text-2xl font-bold text-primary">{sentiments.length}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Total Messages</p>
+                <p className="text-xl sm:text-2xl font-bold text-primary">{sentiments.length}</p>
               </div>
-              <MessageCircle className="h-8 w-8 text-primary" />
+              <MessageCircle className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-card border-border/50">
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Negative Sentiment</p>
-                <p className="text-2xl font-bold text-destructive">{negativePercentage.toFixed(1)}%</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Negative Sentiment</p>
+                <p className="text-xl sm:text-2xl font-bold text-destructive">{negativePercentage.toFixed(1)}%</p>
               </div>
-              <TrendingUp className="h-8 w-8 text-destructive" />
+              <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-destructive" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-card border-border/50">
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Top Emotion</p>
-                <p className="text-lg font-bold capitalize">{topEmotion}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Top Emotion</p>
+                <p className="text-base sm:text-lg font-bold capitalize">{topEmotion}</p>
               </div>
               <Badge 
                 variant="secondary" 
-                className={`bg-${getEmotionColor(topEmotion)} text-white border-0`}
+                className={`bg-${getEmotionColor(topEmotion)} text-white border-0 text-xs`}
               >
                 {emotionCounts[topEmotion] || 0}
               </Badge>
@@ -96,21 +96,22 @@ export const EmotionFeed = ({ sentiments, getEmotionColor, isNegativeEmotion }: 
 
       {/* Live Feed */}
       <Card className="bg-gradient-card border-border/50 shadow-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-primary" />
-            Live Emotion Feed
+        <CardHeader className="p-3 sm:p-6 pb-2 sm:pb-3">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+            <span className="hidden sm:inline">Live Emotion Feed</span>
+            <span className="sm:hidden">Emotion Feed</span>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[400px] pr-4">
-            <div className="space-y-3">
+        <CardContent className="p-3 sm:p-6 pt-0">
+          <ScrollArea className="h-[300px] sm:h-[400px] pr-2 sm:pr-4">
+            <div className="space-y-2 sm:space-y-3">
               <AnimatePresence>
                 {sentiments.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <MessageCircle className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                    <p>No messages analyzed yet.</p>
-                    <p className="text-sm">Start by analyzing a customer message above.</p>
+                  <div className="text-center py-6 sm:py-8 text-muted-foreground">
+                    <MessageCircle className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-2 sm:mb-3 opacity-50" />
+                    <p className="text-sm sm:text-base">No messages analyzed yet.</p>
+                    <p className="text-xs sm:text-sm">Start by analyzing a customer message above.</p>
                   </div>
                 ) : (
                   sentiments.slice().reverse().map((sentiment, index) => (
@@ -120,7 +121,7 @@ export const EmotionFeed = ({ sentiments, getEmotionColor, isNegativeEmotion }: 
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 20 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
-                      className="p-4 bg-background/50 rounded-lg border border-border/50 hover:bg-background/70 transition-colors"
+                      className="p-3 sm:p-4 bg-background/50 rounded-lg border border-border/50 hover:bg-background/70 transition-colors"
                     >
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-2">

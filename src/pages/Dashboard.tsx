@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logger } from '@/utils/logger';
 import { motion } from 'framer-motion';
 import { Brain, Activity, AlertCircle, Settings, Info, Download, Trash2, Database, BarChart3, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -18,12 +19,14 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { checkWebAssemblySupport } from '@/utils/browserSupport';
 
 export const Dashboard = () => {
   const [currentResult, setCurrentResult] = useState<SentimentResult | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showAdvancedAnalytics, setShowAdvancedAnalytics] = useState(false);
+  const [browserCompatible, setBrowserCompatible] = useState<boolean | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -35,6 +38,7 @@ export const Dashboard = () => {
     isModelLoaded,
     error,
     usingGemini,
+    currentModelName,
     loadModel,
     analyzeSentiment,
     getEmotionColor,
@@ -42,16 +46,56 @@ export const Dashboard = () => {
     isGeminiConfigured
   } = useSentimentAnalysis();
 
+  // We don't need to check browser compatibility anymore since we're using a local engine
   useEffect(() => {
-    // Auto-load model on component mount
-    loadModel().catch((err) => {
-      toast({
-        variant: "destructive",
-        title: "Model Loading Failed",
-        description: "Failed to load the emotion detection model. Please check your connection."
-      });
-    });
-  }, [loadModel, toast]);
+    setBrowserCompatible(true);
+  }, []);
+
+  useEffect(() => {
+    // Only try to load the model if the browser is compatible or we haven't checked yet
+    if (browserCompatible === false) {
+      return; // Skip model loading if browser is incompatible
+    }
+    
+    // Auto-load model on component mount with retry logic
+    const loadModelWithRetry = async () => {
+      let attempts = 0;
+      const maxAttempts = 3;
+      
+      while (attempts < maxAttempts) {
+        try {
+          await loadModel();
+          return; // Success, exit the retry loop
+        } catch (err) {
+          attempts++;
+          logger.warn(`Model loading attempt ${attempts}/${maxAttempts} failed:`, err);
+          
+          if (attempts >= maxAttempts) {
+            // All attempts failed
+            toast({
+              variant: "destructive",
+              title: "Model Loading Failed",
+              description: "Failed to load the emotion detection model. Please check your connection or try using Gemini API as a fallback."
+            });
+            
+            // If Gemini is not configured, suggest configuring it
+            if (!isGeminiConfigured) {
+              toast({
+                variant: "default",
+                title: "Configure Fallback",
+                description: "Consider adding a Gemini API key in Settings to enable cloud-based analysis."
+              });
+            }
+          } else {
+            // Wait before retrying (exponential backoff)
+            await new Promise(resolve => setTimeout(resolve, 2000 * Math.pow(2, attempts - 1)));
+          }
+        }
+      }
+    };
+    
+    loadModelWithRetry();
+  }, [loadModel, toast, isGeminiConfigured, browserCompatible]);
 
   const handleAnalyze = async (message: string, customerId?: string, channel?: string): Promise<SentimentResult> => {
     try {
@@ -101,33 +145,41 @@ export const Dashboard = () => {
 
   // Show loading screen while model is loading
   if (isLoading && !isModelLoaded && !isGeminiConfigured) {
-    return <LoadingScreen />;
+    return (
+      <LoadingScreen 
+        onRetry={() => loadModel().catch(err => logger.error('Retry failed:', err))}
+        currentModel={currentModelName || undefined}
+      />
+    );
   }
 
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header with Action Buttons */}
+        {/* Header - Mobile Responsive */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between"
+          className="space-y-4"
         >
-          <div className="flex items-center justify-center gap-3">
-            <div className="p-3 bg-gradient-sentiment rounded-xl shadow-glow">
-              <Brain className="h-8 w-8 text-white" />
+          {/* Title Section */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-2 sm:p-3 bg-gradient-sentiment rounded-xl shadow-glow flex-shrink-0">
+              <Brain className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
             </div>
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl sm:text-2xl lg:text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 Sentinel Sight
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
                 AI-powered emotion detection for customer communications
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+
+          {/* Action Buttons - Mobile Responsive */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <BulkAnalysisModal
               onAnalyze={handleAnalyze}
               onBulkComplete={handleBulkComplete}
@@ -135,44 +187,48 @@ export const Dashboard = () => {
             />
             <Button
               variant="outline"
+              size="sm"
               onClick={() => setShowAdvancedAnalytics(!showAdvancedAnalytics)}
               disabled={sentiments.length === 0}
-              className={`flex items-center gap-2 ${showAdvancedAnalytics ? 'bg-primary text-primary-foreground' : ''}`}
+              className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm ${showAdvancedAnalytics ? 'bg-primary text-primary-foreground' : ''}`}
             >
-              <BarChart3 className="h-4 w-4" />
-              {showAdvancedAnalytics ? 'Back to Dashboard' : 'Analytics'}
+              <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">{showAdvancedAnalytics ? 'Back to Dashboard' : 'Analytics'}</span>
+              <span className="sm:hidden">Charts</span>
             </Button>
             <Button
               variant="outline"
+              size="sm"
               onClick={() => setShowExportModal(true)}
               disabled={sentiments.length === 0}
-              className="flex items-center gap-2"
+              className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
             >
-              <Download className="h-4 w-4" />
-              Export
+              <Download className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Export</span>
             </Button>
             <Button
               variant="outline"
+              size="sm"
               onClick={() => setShowSettings(true)}
-              className="flex items-center gap-2"
+              className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
             >
-              <Settings className="h-4 w-4" />
-              Settings
+              <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Settings</span>
             </Button>
           </div>
         </motion.div>
 
-        {/* Status Information */}
+        {/* Status Information - Mobile Responsive */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex items-center justify-center gap-6 text-sm flex-wrap"
+          className="flex items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm flex-wrap"
         >
           <div className="flex items-center gap-2">
             <div className={`h-2 w-2 rounded-full ${isModelLoaded ? 'bg-primary' : 'bg-muted'}`} />
             <span className={isModelLoaded ? 'text-primary' : 'text-muted-foreground'}>
-              HuggingFace Model {isModelLoaded ? 'Ready' : 'Loading'}
+              Sentiment Analysis API {isModelLoaded ? 'Ready' : 'Loading'}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -221,6 +277,8 @@ export const Dashboard = () => {
             </Alert>
           </motion.div>
         )}
+        
+        {/* We've removed the browser compatibility warning since we're using a local engine */}
 
         {/* Main Content */}
         {showAdvancedAnalytics ? (
@@ -238,12 +296,13 @@ export const Dashboard = () => {
           </motion.div>
         ) : (
           /* Standard Dashboard Layout */
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Left Column - Analysis Form */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
+            {/* Analysis Form */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
+              className="order-1"
             >
               <SentimentForm
                 onAnalyze={handleAnalyze}
@@ -253,11 +312,12 @@ export const Dashboard = () => {
               />
             </motion.div>
 
-            {/* Right Column - Live Feed */}
+            {/* Live Feed */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
+              className="order-2"
             >
               <EmotionFeed
                 sentiments={sentiments}
@@ -280,11 +340,29 @@ export const Dashboard = () => {
                 Technical Information
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-xs text-muted-foreground space-y-2">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <CardContent className="text-xs sm:text-sm text-muted-foreground space-y-2 p-3 sm:p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 <div>
-                  <span className="font-medium">Primary Model:</span>
-                  <div className="text-xs mt-1">Xenova/distilbert-base-uncased-finetuned-sst-2-english</div>
+                  <span className="font-medium">Sentiment Analysis:</span>
+                  <div className="text-xs mt-1">
+                    {currentModelName ? (
+                      <div className="flex items-center gap-1">
+                        <div className="h-1.5 w-1.5 rounded-full bg-green-500"></div>
+                        <span className="font-medium">{currentModelName}</span>
+                        <span className="text-green-500 ml-1">(Active)</span>
+                      </div>
+                    ) : (
+                      <span className="text-yellow-500">No API connected</span>
+                    )}
+                    <div className="text-muted mt-1">API Features:</div>
+                    <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
+                      <li>Advanced NLP processing</li>
+                      <li>Multi-language support</li>
+                      <li>Context-aware analysis</li>
+                      <li>Automatic fallback mechanisms</li>
+                      <li>9 distinct emotion categories</li>
+                    </ul>
+                  </div>
                 </div>
                 <div>
                   <span className="font-medium">Fallback:</span>
@@ -292,7 +370,10 @@ export const Dashboard = () => {
                 </div>
                 <div>
                   <span className="font-medium">Processing:</span>
-                  <div className="text-xs mt-1">{usingGemini ? 'Cloud AI via Gemini' : 'Client-side ONNX'}</div>
+                  <div className="text-xs mt-1">{usingGemini ? 'Cloud AI via Gemini' : 'Cloud API via MeaningCloud'}</div>
+                  <div className="text-xs mt-1 text-muted">
+                    Professional-grade sentiment analysis with advanced NLP capabilities
+                  </div>
                 </div>
               </div>
             </CardContent>

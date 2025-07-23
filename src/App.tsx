@@ -23,7 +23,7 @@ const App = () => (
         <BrowserRouter>
           <div className="min-h-screen flex flex-col">
             <Navbar />
-            <main className="flex-1">
+            <main className="flex-1 overflow-x-hidden">
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/about" element={<About />} />
@@ -34,7 +34,7 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
-            <footer className="p-4 text-center">
+            <footer className="p-3 sm:p-4 text-center text-xs sm:text-sm text-muted-foreground border-t border-border/50">
               © 2025 Sentiment Sentinel
             </footer>
           </div>

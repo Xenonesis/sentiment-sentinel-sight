@@ -1,4 +1,6 @@
 // Google Gemini API integration for sentiment analysis
+import { logger } from '@/utils/logger';
+
 export interface GeminiSentimentResult {
   emotion: string;
   confidence: number;
@@ -85,7 +87,7 @@ Important: Respond with only the JSON object, no other text. Do not include any 
     };
 
   } catch (error) {
-    console.error('Gemini API error:', error);
+    logger.error('Gemini API error:', error);
     
     if (error instanceof Error) {
       throw new Error(`Gemini analysis failed: ${error.message}`);
