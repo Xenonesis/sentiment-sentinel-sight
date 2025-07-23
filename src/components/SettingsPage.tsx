@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { logger } from '@/utils/logger';
 import { motion } from 'framer-motion';
-import { Settings, Key, Save, Eye, EyeOff, CheckCircle, AlertCircle, Database, Trash2, Download, X, CloudLightning } from 'lucide-react';
+import { Settings, Key, Save, Eye, EyeOff, CheckCircle, AlertCircle, Database, Trash2, Download, X, CloudLightning, RotateCcw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,9 +10,11 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { usePersistedSentiments } from '@/hooks/usePersistedSentiments';
 import { useDataExport } from '@/hooks/useDataExport';
+import { useUserSettings } from '@/hooks/useUserSettings';
 import { ApiPreferencesTab } from '@/components/ApiPreferencesTab';
 import { ApiProvider } from '@/services/apiPreferencesService';
 import { 
@@ -55,6 +57,7 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
   // Data management hooks
   const { sentiments, clearHistory, getStorageInfo } = usePersistedSentiments();
   const { exportData } = useDataExport();
+  const { settings: userSettings, updateFormSettings, updateUISettings, clearFormData, resetSettings } = useUserSettings();
 
   useEffect(() => {
     // Load saved API keys from localStorage
@@ -396,6 +399,136 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
               </TabsList>
 
               <TabsContent value="preferences" className="space-y-6">
+                {/* User Preferences Section */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Settings className="h-5 w-5" />
+                      User Preferences
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Form Data Settings */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Form Data</h3>
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <Label className="text-sm font-medium">Remember Form Data</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Automatically save and restore customer ID, channel, and message content
+                          </p>
+                        </div>
+                        <Switch
+                          checked={userSettings.form.rememberFormData}
+                          onCheckedChange={(checked) => updateFormSettings({ rememberFormData: checked })}
+                        />
+                      </div>
+                      
+                      {userSettings.form.rememberFormData && (
+                        <div className="pl-4 border-l-2 border-muted space-y-3">
+                          <div className="text-sm">
+                            <strong>Last Customer ID:</strong> {userSettings.form.lastCustomerId || 'None'}
+                          </div>
+                          <div className="text-sm">
+                            <strong>Last Channel:</strong> {userSettings.form.lastChannel || 'None'}
+                          </div>
+                          <div className="text-sm">
+                            <strong>Last Message:</strong> {userSettings.form.lastMessage ? 
+                              `${userSettings.form.lastMessage.substring(0, 50)}${userSettings.form.lastMessage.length > 50 ? '...' : ''}` : 'None'}
+                          </div>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={clearFormData}
+                            className="mt-2"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Clear Saved Form Data
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+
+                    <Separator />
+
+                    {/* UI Settings */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Interface</h3>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <Label className="text-sm font-medium">Auto-save Results</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Automatically save analysis results to history
+                          </p>
+                        </div>
+                        <Switch
+                          checked={userSettings.ui.autoSaveResults}
+                          onCheckedChange={(checked) => updateUISettings({ autoSaveResults: checked })}
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <Label className="text-sm font-medium">Show Tooltips</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Display helpful tooltips throughout the interface
+                          </p>
+                        </div>
+                        <Switch
+                          checked={userSettings.ui.showTooltips}
+                          onCheckedChange={(checked) => updateUISettings({ showTooltips: checked })}
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <Label className="text-sm font-medium">Compact Mode</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Use a more compact layout to fit more content
+                          </p>
+                        </div>
+                        <Switch
+                          checked={userSettings.ui.compactMode}
+                          onCheckedChange={(checked) => updateUISettings({ compactMode: checked })}
+                        />
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Reset Settings */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Reset</h3>
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <Label className="text-sm font-medium">Reset All Preferences</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Reset all user preferences to default values
+                          </p>
+                        </div>
+                        <Button 
+                          variant="destructive" 
+                          size="sm" 
+                          onClick={() => {
+                            if (confirm('Are you sure you want to reset all preferences? This cannot be undone.')) {
+                              resetSettings();
+                              toast({
+                                title: "Preferences Reset",
+                                description: "All user preferences have been reset to defaults."
+                              });
+                            }
+                          }}
+                        >
+                          <RotateCcw className="h-4 w-4 mr-2" />
+                          Reset Preferences
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* API Preferences Section */}
                 <ApiPreferencesTab 
                   onProviderConfigClick={(provider: ApiProvider) => {
                     // Switch to the appropriate tab based on provider

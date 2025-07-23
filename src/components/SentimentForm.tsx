@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Send, User, MessageSquare, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { SentimentResult } from '@/hooks/useSentimentAnalysis';
+import { useUserSettings } from '@/hooks/useUserSettings';
 
 interface SentimentFormProps {
   onAnalyze: (message: string, customerId?: string, channel?: string) => Promise<SentimentResult>;
@@ -18,13 +19,29 @@ interface SentimentFormProps {
 }
 
 export const SentimentForm = ({ onAnalyze, isAnalyzing, result, getEmotionColor }: SentimentFormProps) => {
+  const { settings, saveFormData, updateFormSettings } = useUserSettings();
+  
   const [message, setMessage] = useState('');
   const [customerId, setCustomerId] = useState('');
   const [channel, setChannel] = useState('');
 
+  // Load saved form data on component mount
+  useEffect(() => {
+    if (settings.form.rememberFormData) {
+      setMessage(settings.form.lastMessage);
+      setCustomerId(settings.form.lastCustomerId);
+      setChannel(settings.form.lastChannel);
+    }
+  }, [settings.form.rememberFormData, settings.form.lastMessage, settings.form.lastCustomerId, settings.form.lastChannel]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
+    
+    // Save form data if remember option is enabled
+    if (settings.form.rememberFormData) {
+      saveFormData(customerId, channel, message);
+    }
     
     await onAnalyze(message, customerId || undefined, channel || undefined);
   };
