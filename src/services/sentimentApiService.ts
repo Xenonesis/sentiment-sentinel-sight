@@ -2,6 +2,7 @@
  * Real sentiment analysis service using a public API
  */
 import { logger } from '@/utils/logger';
+import { getAdvancedSettings } from './apiPreferencesService';
 
 export interface ApiSentimentResult {
   emotion: string;
@@ -57,8 +58,9 @@ async function analyzeSentimentWithPrimaryApi(text: string): Promise<ApiSentimen
   });
 
   // Make the API request with a timeout
+  const settings = getAdvancedSettings();
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+  const timeoutId = setTimeout(() => controller.abort(), settings.timeout);
   
   try {
     const response = await fetch(`${API_URL}?${params.toString()}`, {
@@ -100,8 +102,9 @@ async function analyzeSentimentWithBackupApi(text: string): Promise<ApiSentiment
   });
 
   // Make the API request with a timeout
+  const settings = getAdvancedSettings();
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+  const timeoutId = setTimeout(() => controller.abort(), settings.timeout);
   
   try {
     const response = await fetch(`${BACKUP_API_URL}?${params.toString()}`, {

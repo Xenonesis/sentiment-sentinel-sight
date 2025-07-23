@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { SentimentResult } from '@/hooks/useSentimentAnalysis';
 import { useUserSettings } from '@/hooks/useUserSettings';
+import { FeatureHighlight } from '@/components/FeatureHighlight';
 
 interface SentimentFormProps {
   onAnalyze: (message: string, customerId?: string, channel?: string) => Promise<SentimentResult>;
@@ -19,7 +20,7 @@ interface SentimentFormProps {
 }
 
 export const SentimentForm = ({ onAnalyze, isAnalyzing, result, getEmotionColor }: SentimentFormProps) => {
-  const { settings, saveFormData, updateFormSettings } = useUserSettings();
+  const { settings, saveFormData } = useUserSettings();
   
   const [message, setMessage] = useState('');
   const [customerId, setCustomerId] = useState('');
@@ -55,16 +56,47 @@ export const SentimentForm = ({ onAnalyze, isAnalyzing, result, getEmotionColor 
 
   const setExampleMessage = (exampleMessage: string) => {
     setMessage(exampleMessage);
+    // Auto-analyze if enabled
+    if (settings.analysis.autoAnalyzeOnPaste) {
+      // Small delay to allow state update
+      setTimeout(() => {
+        if (exampleMessage.trim()) {
+          onAnalyze(exampleMessage, customerId || undefined, channel || undefined);
+        }
+      }, 100);
+    }
+  };
+
+  // Handle paste events for auto-analysis
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    if (settings.analysis.autoAnalyzeOnPaste) {
+      const pastedText = e.clipboardData.getData('text');
+      if (pastedText.trim()) {
+        // Small delay to allow the paste to complete
+        setTimeout(() => {
+          onAnalyze(pastedText, customerId || undefined, channel || undefined);
+        }, 100);
+      }
+    }
   };
 
   return (
-    <Card className="bg-gradient-card border-border/50 shadow-card">
-      <CardHeader className="p-3 sm:p-6 pb-2 sm:pb-3">
+    <Card className="bg-gradient-card border-border/50 shadow-card sentiment-form">
+      <CardHeader className="p-3 sm:p-6 pb-2 sm:pb-3 relative">
         <CardTitle className="flex items-center gap-2 text-base sm:text-lg text-primary">
           <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5" />
           <span className="hidden sm:inline">Customer Message Analysis</span>
           <span className="sm:hidden">Message Analysis</span>
         </CardTitle>
+        {settings.form.rememberFormData && (
+          <FeatureHighlight
+            feature="form-memory"
+            title="Smart Form Memory"
+            description="Your form data is now being remembered! Customer ID, channel, and messages are automatically restored."
+            position="bottom"
+            delay={1500}
+          />
+        )}
       </CardHeader>
       <CardContent className="space-y-4 sm:space-y-6 p-3 sm:p-6 pt-0">
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -105,6 +137,7 @@ export const SentimentForm = ({ onAnalyze, isAnalyzing, result, getEmotionColor 
               id="message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
+              onPaste={handlePaste}
               placeholder="Type or paste the customer message here..."
               className="min-h-[100px] sm:min-h-[120px] bg-background/50 resize-none text-sm"
               required
@@ -169,6 +202,18 @@ export const SentimentForm = ({ onAnalyze, isAnalyzing, result, getEmotionColor 
                 <span className="text-muted-foreground">Confidence:</span>
                 <span className="font-medium">{(result.confidence * 100).toFixed(1)}%</span>
               </div>
+              {settings.analysis.showDetailedResults && (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Analysis Provider:</span>
+                    <span className="font-medium capitalize">{result.provider || 'Auto'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Processing Time:</span>
+                    <span className="font-medium">{result.processingTime || 'N/A'}ms</span>
+                  </div>
+                </>
+              )}
               {result.customerId && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Customer ID:</span>

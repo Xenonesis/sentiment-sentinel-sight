@@ -19,11 +19,41 @@ export interface UserUISettings {
   autoSaveResults: boolean;
   showTooltips: boolean;
   compactMode: boolean;
+  showOnboarding: boolean;
+}
+
+export interface UserAnalysisSettings {
+  defaultConfidenceThreshold: number;
+  autoAnalyzeOnPaste: boolean;
+  showDetailedResults: boolean;
+  preferredProvider: 'auto' | 'huggingface' | 'ollama' | 'gemini' | 'sentiment-api';
+  enableBatchMode: boolean;
+  maxHistoryItems: number;
+  // Advanced settings
+  apiTimeout: number; // in milliseconds
+  retryAttempts: number;
+  retryDelay: number; // in milliseconds
+  enableFallback: boolean;
+  customModels: {
+    huggingface: string;
+    ollama: string;
+    gemini: string;
+  };
+  analysisDepth: 'basic' | 'standard' | 'detailed' | 'comprehensive';
+  enableEmotionDetection: boolean;
+  enableSentimentScoring: boolean;
+  enableKeywordExtraction: boolean;
+  enableLanguageDetection: boolean;
+  confidenceCalibration: number; // adjustment factor for confidence scores
+  batchSize: number; // max items per batch
+  enableCaching: boolean;
+  cacheExpiry: number; // in minutes
 }
 
 export interface UserSettings {
   form: UserFormSettings;
   ui: UserUISettings;
+  analysis: UserAnalysisSettings;
   lastUpdated: string;
 }
 
@@ -39,7 +69,35 @@ const DEFAULT_SETTINGS: UserSettings = {
     defaultView: 'simple',
     autoSaveResults: true,
     showTooltips: true,
-    compactMode: false
+    compactMode: false,
+    showOnboarding: true
+  },
+  analysis: {
+    defaultConfidenceThreshold: 0.7,
+    autoAnalyzeOnPaste: false,
+    showDetailedResults: true,
+    preferredProvider: 'auto',
+    enableBatchMode: false,
+    maxHistoryItems: 1000,
+    // Advanced settings
+    apiTimeout: 30000, // 30 seconds
+    retryAttempts: 3,
+    retryDelay: 1000, // 1 second
+    enableFallback: true,
+    customModels: {
+      huggingface: 'cardiffnlp/twitter-roberta-base-sentiment-latest',
+      ollama: 'llama2',
+      gemini: 'gemini-pro'
+    },
+    analysisDepth: 'standard',
+    enableEmotionDetection: true,
+    enableSentimentScoring: true,
+    enableKeywordExtraction: false,
+    enableLanguageDetection: false,
+    confidenceCalibration: 1.0,
+    batchSize: 10,
+    enableCaching: true,
+    cacheExpiry: 60 // 1 hour
   },
   lastUpdated: new Date().toISOString()
 };
@@ -66,6 +124,10 @@ export const useUserSettings = () => {
           ui: {
             ...DEFAULT_SETTINGS.ui,
             ...parsed.ui
+          },
+          analysis: {
+            ...DEFAULT_SETTINGS.analysis,
+            ...parsed.analysis
           }
         };
       }
@@ -105,6 +167,17 @@ export const useUserSettings = () => {
       ...prev,
       ui: {
         ...prev.ui,
+        ...updates
+      }
+    }));
+  }, []);
+
+  // Update analysis settings
+  const updateAnalysisSettings = useCallback((updates: Partial<UserAnalysisSettings>) => {
+    setSettings(prev => ({
+      ...prev,
+      analysis: {
+        ...prev.analysis,
         ...updates
       }
     }));
@@ -175,6 +248,7 @@ export const useUserSettings = () => {
     settings,
     updateFormSettings,
     updateUISettings,
+    updateAnalysisSettings,
     saveFormData,
     clearFormData,
     resetSettings,

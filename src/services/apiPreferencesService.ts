@@ -7,12 +7,56 @@ export type ApiProvider = 'huggingface' | 'ollama' | 'gemini' | 'sentiment-api';
 
 import { logger } from '@/utils/logger';
 
+export interface AdvancedSettings {
+  timeout: number; // in milliseconds
+  retryAttempts: number;
+  customModels: Record<ApiProvider, string>;
+  modelParameters: {
+    gemini: {
+      temperature: number;
+      topK: number;
+      topP: number;
+      maxOutputTokens: number;
+    };
+    ollama: {
+      temperature: number;
+      top_p: number;
+      top_k: number;
+    };
+  };
+}
+
 export interface ApiPreferences {
   defaultProvider: ApiProvider;
   providerOrder: ApiProvider[];
   enabledProviders: Record<ApiProvider, boolean>;
   enabledModels: Record<string, boolean>;
+  advancedSettings: AdvancedSettings;
 }
+
+const DEFAULT_ADVANCED_SETTINGS: AdvancedSettings = {
+  timeout: 30000, // 30 seconds default
+  retryAttempts: 2,
+  customModels: {
+    'huggingface': 'cardiffnlp/twitter-roberta-base-sentiment-latest',
+    'ollama': 'llama2',
+    'gemini': 'gemini-2.0-flash',
+    'sentiment-api': 'general'
+  },
+  modelParameters: {
+    gemini: {
+      temperature: 0.3,
+      topK: 1,
+      topP: 0.8,
+      maxOutputTokens: 200
+    },
+    ollama: {
+      temperature: 0.7,
+      top_p: 0.9,
+      top_k: 40
+    }
+  }
+};
 
 const DEFAULT_PREFERENCES: ApiPreferences = {
   defaultProvider: 'huggingface',
@@ -23,7 +67,8 @@ const DEFAULT_PREFERENCES: ApiPreferences = {
     'gemini': true,
     'sentiment-api': true
   },
-  enabledModels: {}
+  enabledModels: {},
+  advancedSettings: DEFAULT_ADVANCED_SETTINGS
 };
 
 const PREFERENCES_KEY = 'api_preferences';
@@ -43,6 +88,26 @@ export const getApiPreferences = (): ApiPreferences => {
         enabledProviders: {
           ...DEFAULT_PREFERENCES.enabledProviders,
           ...parsed.enabledProviders
+        },
+        advancedSettings: {
+          ...DEFAULT_ADVANCED_SETTINGS,
+          ...parsed.advancedSettings,
+          customModels: {
+            ...DEFAULT_ADVANCED_SETTINGS.customModels,
+            ...parsed.advancedSettings?.customModels
+          },
+          modelParameters: {
+            ...DEFAULT_ADVANCED_SETTINGS.modelParameters,
+            ...parsed.advancedSettings?.modelParameters,
+            gemini: {
+              ...DEFAULT_ADVANCED_SETTINGS.modelParameters.gemini,
+              ...parsed.advancedSettings?.modelParameters?.gemini
+            },
+            ollama: {
+              ...DEFAULT_ADVANCED_SETTINGS.modelParameters.ollama,
+              ...parsed.advancedSettings?.modelParameters?.ollama
+            }
+          }
         }
       };
     }
@@ -167,6 +232,76 @@ export const getProviderDescription = (provider: ApiProvider): string => {
     'sentiment-api': 'Cloud-based sentiment analysis'
   };
   return descriptions[provider];
+};
+
+/**
+ * Update advanced settings
+ */
+export const updateAdvancedSettings = (settings: Partial<AdvancedSettings>): void => {
+  const preferences = getApiPreferences();
+  preferences.advancedSettings = {
+    ...preferences.advancedSettings,
+    ...settings,
+    customModels: {
+      ...preferences.advancedSettings.customModels,
+      ...settings.customModels
+    },
+    modelParameters: {
+      ...preferences.advancedSettings.modelParameters,
+      ...settings.modelParameters,
+      gemini: {
+        ...preferences.advancedSettings.modelParameters.gemini,
+        ...settings.modelParameters?.gemini
+      },
+      ollama: {
+        ...preferences.advancedSettings.modelParameters.ollama,
+        ...settings.modelParameters?.ollama
+      }
+    }
+  };
+  saveApiPreferences(preferences);
+};
+
+/**
+ * Get current advanced settings
+ */
+export const getAdvancedSettings = (): AdvancedSettings => {
+  const preferences = getApiPreferences();
+  return preferences.advancedSettings;
+};
+
+/**
+ * Update custom model for a provider
+ */
+export const setCustomModel = (provider: ApiProvider, model: string): void => {
+  const preferences = getApiPreferences();
+  preferences.advancedSettings.customModels[provider] = model;
+  saveApiPreferences(preferences);
+};
+
+/**
+ * Get custom model for a provider
+ */
+export const getCustomModel = (provider: ApiProvider): string => {
+  const preferences = getApiPreferences();
+  return preferences.advancedSettings.customModels[provider] || DEFAULT_ADVANCED_SETTINGS.customModels[provider];
+};
+
+/**
+ * Update timeout setting
+ */
+export const setTimeout = (timeout: number): void => {
+  const preferences = getApiPreferences();
+  preferences.advancedSettings.timeout = Math.max(1000, Math.min(120000, timeout)); // 1s to 2min
+  saveApiPreferences(preferences);
+};
+
+/**
+ * Get current timeout setting
+ */
+export const getTimeout = (): number => {
+  const preferences = getApiPreferences();
+  return preferences.advancedSettings.timeout;
 };
 
 /**

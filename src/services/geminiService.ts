@@ -1,5 +1,6 @@
 // Google Gemini API integration for sentiment analysis
 import { logger } from '@/utils/logger';
+import { getAdvancedSettings, getCustomModel } from './apiPreferencesService';
 
 export interface GeminiSentimentResult {
   emotion: string;
@@ -25,8 +26,15 @@ Customer message: "${message}"
 
 Important: Respond with only the JSON object, no other text. Do not include any markdown formatting or additional text outside the JSON.`;
 
+  const settings = getAdvancedSettings();
+  const model = getCustomModel('gemini');
+  
+  // Create abort controller for timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), settings.timeout);
+
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -42,13 +50,16 @@ Important: Respond with only the JSON object, no other text. Do not include any 
           }
         ],
         generationConfig: {
-          temperature: 0.3,
-          topK: 1,
-          topP: 0.8,
-          maxOutputTokens: 200,
-        }
+          temperature: settings.modelParameters.gemini.temperature,
+          topK: settings.modelParameters.gemini.topK,
+          topP: settings.modelParameters.gemini.topP,
+          maxOutputTokens: settings.modelParameters.gemini.maxOutputTokens,
+        },
+        signal: controller.signal
       })
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       throw new Error(`Gemini API error: ${response.status}`);
@@ -87,6 +98,7 @@ Important: Respond with only the JSON object, no other text. Do not include any 
     };
 
   } catch (error) {
+    clearTimeout(timeoutId);
     logger.error('Gemini API error:', error);
     
     if (error instanceof Error) {

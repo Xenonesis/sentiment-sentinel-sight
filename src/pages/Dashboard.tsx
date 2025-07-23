@@ -11,6 +11,8 @@ import { ExportModal } from '@/components/ExportModal';
 import { BulkAnalysisModal } from '@/components/BulkAnalysisModal';
 import { AdvancedAnalyticsDashboard } from '@/components/AdvancedAnalyticsDashboard';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { OnboardingTour } from '@/components/OnboardingTour';
+import { FeatureHighlight } from '@/components/FeatureHighlight';
 import { useSentimentAnalysis, SentimentResult } from '@/hooks/useSentimentAnalysis';
 import { usePersistedSentiments } from '@/hooks/usePersistedSentiments';
 import { useToast } from '@/hooks/use-toast';
@@ -155,6 +157,7 @@ export const Dashboard = () => {
 
   return (
     <ErrorBoundary>
+      <OnboardingTour />
       <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header - Mobile Responsive */}
@@ -206,15 +209,25 @@ export const Dashboard = () => {
               <Download className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">Export</span>
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowSettings(true)}
-              className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
-            >
-              <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="hidden sm:inline">Settings</span>
-            </Button>
+            <div className="relative">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowSettings(true)}
+                className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
+                data-testid="settings-button"
+              >
+                <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Settings</span>
+              </Button>
+              <FeatureHighlight
+                feature="enhanced-settings"
+                title="Enhanced Settings!"
+                description="New user preferences, analysis defaults, and form memory options are now available."
+                position="bottom"
+                delay={3000}
+              />
+            </div>
           </div>
         </motion.div>
 

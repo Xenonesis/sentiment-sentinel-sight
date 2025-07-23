@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { logger } from '@/utils/logger';
 import { motion } from 'framer-motion';
-import { Settings, Key, Save, Eye, EyeOff, CheckCircle, AlertCircle, Database, Trash2, Download, X, CloudLightning, RotateCcw } from 'lucide-react';
+import { Settings, Key, Save, Eye, EyeOff, CheckCircle, AlertCircle, Database, Trash2, Download, X, CloudLightning, RotateCcw, Sliders } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,6 +16,7 @@ import { usePersistedSentiments } from '@/hooks/usePersistedSentiments';
 import { useDataExport } from '@/hooks/useDataExport';
 import { useUserSettings } from '@/hooks/useUserSettings';
 import { ApiPreferencesTab } from '@/components/ApiPreferencesTab';
+import { AdvancedSettingsTab } from '@/components/AdvancedSettingsTab';
 import { ApiProvider } from '@/services/apiPreferencesService';
 import { 
   getOllamaModels, 
@@ -57,7 +58,7 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
   // Data management hooks
   const { sentiments, clearHistory, getStorageInfo } = usePersistedSentiments();
   const { exportData } = useDataExport();
-  const { settings: userSettings, updateFormSettings, updateUISettings, clearFormData, resetSettings } = useUserSettings();
+  const { settings: userSettings, updateFormSettings, updateUISettings, updateAnalysisSettings, clearFormData, resetSettings } = useUserSettings();
 
   useEffect(() => {
     // Load saved API keys from localStorage
@@ -370,7 +371,7 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
           </CardHeader>
           <CardContent className="p-3 sm:p-6">
             <Tabs defaultValue="preferences" className="space-y-4 sm:space-y-6">
-              <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 gap-1">
+              <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 gap-1">
                 <TabsTrigger value="preferences" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
                   <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
                   <span className="hidden sm:inline">Preferences</span>
@@ -380,6 +381,11 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
                   <Key className="h-3 w-3 sm:h-4 sm:w-4" />
                   <span className="hidden sm:inline">Gemini API</span>
                   <span className="sm:hidden">Gemini</span>
+                </TabsTrigger>
+                <TabsTrigger value="advanced" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                  <Sliders className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Advanced</span>
+                  <span className="sm:hidden">Adv</span>
                 </TabsTrigger>
                 <TabsTrigger value="ollama" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
                   <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -497,6 +503,94 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
 
                     <Separator />
 
+                    {/* Analysis Settings */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Analysis Defaults</h3>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <Label className="text-sm font-medium">Auto-analyze on Paste</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Automatically analyze text when pasted into the message field
+                          </p>
+                        </div>
+                        <Switch
+                          checked={userSettings.analysis.autoAnalyzeOnPaste}
+                          onCheckedChange={(checked) => updateAnalysisSettings({ autoAnalyzeOnPaste: checked })}
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <Label className="text-sm font-medium">Show Detailed Results</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Display additional analysis details and confidence scores
+                          </p>
+                        </div>
+                        <Switch
+                          checked={userSettings.analysis.showDetailedResults}
+                          onCheckedChange={(checked) => updateAnalysisSettings({ showDetailedResults: checked })}
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <Label className="text-sm font-medium">Enable Batch Mode</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Allow processing multiple messages at once
+                          </p>
+                        </div>
+                        <Switch
+                          checked={userSettings.analysis.enableBatchMode}
+                          onCheckedChange={(checked) => updateAnalysisSettings({ enableBatchMode: checked })}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Confidence Threshold</Label>
+                        <p className="text-xs text-muted-foreground mb-2">
+                          Minimum confidence level for analysis results (0.1 - 1.0)
+                        </p>
+                        <div className="flex items-center space-x-4">
+                          <input
+                            type="range"
+                            min="0.1"
+                            max="1.0"
+                            step="0.1"
+                            value={userSettings.analysis.defaultConfidenceThreshold}
+                            onChange={(e) => updateAnalysisSettings({ defaultConfidenceThreshold: parseFloat(e.target.value) })}
+                            className="flex-1"
+                          />
+                          <Badge variant="outline" className="min-w-[60px] text-center">
+                            {(userSettings.analysis.defaultConfidenceThreshold * 100).toFixed(0)}%
+                          </Badge>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Max History Items</Label>
+                        <p className="text-xs text-muted-foreground mb-2">
+                          Maximum number of analysis results to keep in history
+                        </p>
+                        <div className="flex items-center space-x-4">
+                          <input
+                            type="range"
+                            min="100"
+                            max="5000"
+                            step="100"
+                            value={userSettings.analysis.maxHistoryItems}
+                            onChange={(e) => updateAnalysisSettings({ maxHistoryItems: parseInt(e.target.value) })}
+                            className="flex-1"
+                          />
+                          <Badge variant="outline" className="min-w-[80px] text-center">
+                            {userSettings.analysis.maxHistoryItems}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Separator />
+
                     {/* Reset Settings */}
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold">Reset</h3>
@@ -550,6 +644,10 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
                     }
                   }}
                 />
+              </TabsContent>
+
+              <TabsContent value="advanced" className="space-y-6">
+                <AdvancedSettingsTab />
               </TabsContent>
 
               <TabsContent value="api" className="space-y-6">

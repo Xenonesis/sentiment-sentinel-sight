@@ -1,4 +1,5 @@
 // Ollama local AI integration for sentiment analysis
+import { getAdvancedSettings, getCustomModel } from './apiPreferencesService';
 export interface OllamaModel {
   name: string;
   model: string;
@@ -86,8 +87,10 @@ export const getOllamaModels = async (): Promise<OllamaModel[]> => {
  */
 export const analyzeWithOllama = async (
   message: string,
-  modelName: string = 'llama2'
+  modelName?: string
 ): Promise<OllamaSentimentResult> => {
+  const settings = getAdvancedSettings();
+  const model = modelName || getCustomModel('ollama');
   const prompt = `Analyze the sentiment and emotion of this customer message. Return your response in this exact JSON format:
 {
   "emotion": "one of: joy, anger, fear, sadness, surprise, disgust, love, optimism, neutral",
@@ -99,24 +102,31 @@ Customer message: "${message}"
 
 Important: Respond with only the JSON object, no other text. Do not include any markdown formatting or additional text outside the JSON.`;
 
+  // Create abort controller for timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), settings.timeout);
+
   try {
     const response = await fetch(`${OLLAMA_BASE_URL}/api/generate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      signal: controller.signal,
       body: JSON.stringify({
-        model: modelName,
+        model: model,
         prompt: prompt,
         stream: false,
         options: {
-          temperature: 0.3,
-          top_k: 40,
-          top_p: 0.8,
+          temperature: settings.modelParameters.ollama.temperature,
+          top_k: settings.modelParameters.ollama.top_k,
+          top_p: settings.modelParameters.ollama.top_p,
           num_predict: 200,
         },
       }),
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       throw new Error(`Ollama API error: ${response.status}`);
@@ -191,6 +201,7 @@ Important: Respond with only the JSON object, no other text. Do not include any 
     };
 
   } catch (error) {
+    clearTimeout(timeoutId);
     logger.error('Ollama API error:', error);
     
     if (error instanceof Error) {
