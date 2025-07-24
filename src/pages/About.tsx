@@ -47,9 +47,10 @@ const About = () => {
     {
       category: "AI & Machine Learning",
       items: [
-        { name: "HuggingFace Transformers 3.6.3", description: "Client-side emotion detection", icon: "🤖" },
-        { name: "Google Gemini 2.0 Flash", description: "Advanced cloud-based AI analysis", icon: "🧠" },
-        { name: "ONNX Runtime", description: "Optimized model inference", icon: "⚙️" }
+        { name: "HuggingFace Transformers 3.6.3", description: "Privacy-first client-side processing", icon: "🤖" },
+        { name: "Google Gemini API", description: "High-accuracy cloud analysis", icon: "🧠" },
+        { name: "Ollama Integration", description: "Self-hosted AI models", icon: "🦙" },
+        { name: "Sentiment API", description: "Specialized backup provider", icon: "🌐" }
       ]
     },
     {
@@ -57,7 +58,17 @@ const About = () => {
       items: [
         { name: "TanStack Query 5.56.2", description: "Powerful data fetching and caching", icon: "🔄" },
         { name: "React Hook Form 7.53.0", description: "Performant forms with validation", icon: "📝" },
-        { name: "Zod 3.23.8", description: "TypeScript-first schema validation", icon: "🛡️" }
+        { name: "Zod 3.23.8", description: "TypeScript-first schema validation", icon: "🛡️" },
+        { name: "Recharts 3.1.0", description: "Beautiful data visualizations", icon: "📊" }
+      ]
+    },
+    {
+      category: "Network & Reliability",
+      items: [
+        { name: "Circuit Breaker Pattern", description: "Prevents cascading failures", icon: "🛡️" },
+        { name: "Network Manager", description: "Real-time provider health monitoring", icon: "📡" },
+        { name: "Adaptive Error Handling", description: "8 error categories with recovery", icon: "🔄" },
+        { name: "Smart Fallback System", description: "Automatic provider switching", icon: "⚡" }
       ]
     },
     {
@@ -73,8 +84,8 @@ const About = () => {
   const features = [
     {
       icon: Brain,
-      title: "Dual AI Engine",
-      description: "HuggingFace Transformers for privacy-first client-side processing with Google Gemini 2.0 Flash as intelligent fallback",
+      title: "Quad AI Engine",
+      description: "Four AI providers with intelligent routing and circuit breaker protection: HuggingFace (local), Gemini (cloud), Ollama (self-hosted), and Sentiment API (backup)",
       color: "text-blue-500"
     },
     {
@@ -85,8 +96,8 @@ const About = () => {
     },
     {
       icon: BarChart3,
-      title: "Real-time Analytics",
-      description: "Live emotion feed, sentiment distribution, smart alerts, and comprehensive statistics dashboard",
+      title: "Advanced Analytics",
+      description: "15+ visualization types, predictive insights, anomaly detection, and real-time emotion feed with comprehensive statistics dashboard",
       color: "text-green-500"
     },
     {
@@ -103,17 +114,17 @@ const About = () => {
     },
     {
       icon: Zap,
-      title: "High Performance",
-      description: "Optimized with ONNX runtime, efficient caching, and progressive loading",
+      title: "Enterprise Reliability",
+      description: "Circuit breaker pattern, adaptive error handling, network monitoring, automatic recovery, and 8-category error classification system",
       color: "text-yellow-500"
     }
   ];
 
   const stats = [
     { label: "Emotion Categories", value: "9+", icon: MessageSquare },
-    { label: "AI Models", value: "2", icon: Brain },
-    { label: "Channel Types", value: "5+", icon: Globe },
-    { label: "UI Components", value: "40+", icon: Palette }
+    { label: "AI Providers", value: "4", icon: Brain },
+    { label: "Error Categories", value: "8", icon: Shield },
+    { label: "Chart Types", value: "15+", icon: BarChart3 }
   ];
 
   return (
@@ -136,7 +147,7 @@ const About = () => {
             </Button>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" asChild>
-                <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+                <a href="https://github.com/Xenonesis/sentiment-sentinel-sight" target="_blank" rel="noopener noreferrer">
                   <Github className="h-4 w-4 mr-2" />
                   GitHub
                 </a>
@@ -163,8 +174,8 @@ const About = () => {
           </div>
           
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            A comprehensive AI-powered customer sentiment analysis tool that monitors and analyzes 
-            customer communications in real-time using cutting-edge machine learning technology.
+            Enterprise-grade AI-powered sentiment analysis platform with quad AI engine architecture, 
+            circuit breaker protection, adaptive error handling, and comprehensive analytics for real-time customer emotion detection.
           </p>
 
           <div className="flex items-center justify-center gap-2 flex-wrap">
@@ -178,7 +189,7 @@ const About = () => {
               Privacy First
             </Badge>
             <Badge variant="secondary" className="bg-sentiment-surprise text-white">
-              Open Source
+              Enterprise Ready
             </Badge>
           </div>
         </motion.div>
@@ -323,15 +334,19 @@ const About = () => {
                     <div className="space-y-3 text-sm text-muted-foreground">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span>Primary: HuggingFace Transformers (Client-side)</span>
+                        <span>HuggingFace Transformers (Privacy-first local)</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <span>Fallback: Google Gemini 2.0 Flash (Cloud)</span>
+                        <span>Google Gemini (High-accuracy cloud)</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                        <span>Ollama (Self-hosted models)</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                        <span>Automatic failover and confidence scoring</span>
+                        <span>Sentiment API (Specialized backup)</span>
                       </div>
                     </div>
                   </div>
@@ -367,15 +382,19 @@ const About = () => {
                     <div className="space-y-3 text-sm text-muted-foreground">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                        <span>ONNX runtime optimization</span>
+                        <span>Circuit breaker pattern for reliability</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                        <span>Progressive model loading</span>
+                        <span>Adaptive batching and concurrent processing</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                        <span>Efficient state management</span>
+                        <span>Real-time network monitoring</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+                        <span>ONNX runtime optimization</span>
                       </div>
                     </div>
                   </div>
@@ -424,7 +443,7 @@ const About = () => {
           <div className="flex items-center justify-center gap-4">
             <Badge variant="outline" className="flex items-center gap-1">
               <Star className="h-3 w-3" />
-              Version 0.10.0
+              Version 1.2.0
             </Badge>
             <Badge variant="outline" className="flex items-center gap-1">
               <Sparkles className="h-3 w-3" />

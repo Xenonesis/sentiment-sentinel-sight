@@ -40,7 +40,7 @@ export default defineConfig(({ mode }) => ({
             '@radix-ui/react-hover-card',
             '@radix-ui/react-label',
             '@radix-ui/react-menubar',
-            '@radix-ui/react-navigation-menu',
+
             '@radix-ui/react-progress',
             '@radix-ui/react-radio-group',
             '@radix-ui/react-scroll-area',

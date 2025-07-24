@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { SentimentResult } from '@/hooks/useSentimentAnalysis';
 import { useUserSettings } from '@/hooks/useUserSettings';
+import { useAdaptiveExamples } from '@/hooks/useAdaptiveExamples';
 import { FeatureHighlight } from '@/components/FeatureHighlight';
 
 interface SentimentFormProps {
@@ -17,10 +18,12 @@ interface SentimentFormProps {
   isAnalyzing: boolean;
   result?: SentimentResult | null;
   getEmotionColor: (emotion: string) => string;
+  sentimentHistory: SentimentResult[];
 }
 
-export const SentimentForm = ({ onAnalyze, isAnalyzing, result, getEmotionColor }: SentimentFormProps) => {
+export const SentimentForm = ({ onAnalyze, isAnalyzing, result, getEmotionColor, sentimentHistory }: SentimentFormProps) => {
   const { settings, saveFormData } = useUserSettings();
+  const { examples, userPattern, updateExampleUsage, lastUpdate } = useAdaptiveExamples(sentimentHistory);
   
   const [message, setMessage] = useState('');
   const [customerId, setCustomerId] = useState('');
@@ -47,21 +50,16 @@ export const SentimentForm = ({ onAnalyze, isAnalyzing, result, getEmotionColor 
     await onAnalyze(message, customerId || undefined, channel || undefined);
   };
 
-  const exampleMessages = [
-    "I love this product! It's amazing and works perfectly!",
-    "This service is terrible and I'm very frustrated with the experience",
-    "The support team was helpful but the product needs improvement", 
-    "Thank you so much for your quick response and excellent service!"
-  ];
-
-  const setExampleMessage = (exampleMessage: string) => {
-    setMessage(exampleMessage);
+  const setExampleMessage = (exampleText: string, exampleId: string) => {
+    setMessage(exampleText);
+    updateExampleUsage(exampleId);
+    
     // Auto-analyze if enabled
     if (settings.analysis.autoAnalyzeOnPaste) {
       // Small delay to allow state update
       setTimeout(() => {
-        if (exampleMessage.trim()) {
-          onAnalyze(exampleMessage, customerId || undefined, channel || undefined);
+        if (exampleText.trim()) {
+          onAnalyze(exampleText, customerId || undefined, channel || undefined);
         }
       }, 100);
     }
@@ -163,21 +161,71 @@ export const SentimentForm = ({ onAnalyze, isAnalyzing, result, getEmotionColor 
           </Button>
         </form>
 
-        {/* Example Messages */}
+        {/* Adaptive Example Messages */}
         <div className="space-y-3">
-          <Label className="text-sm font-medium">Try these examples:</Label>
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-medium">
+              {userPattern ? 'Personalized examples for you:' : 'Try these real customer scenarios:'}
+            </Label>
+            {userPattern && (
+              <Badge variant="secondary" className="text-xs">
+                🧠 AI Adapted
+              </Badge>
+            )}
+          </div>
+          
           <div className="grid grid-cols-1 gap-2">
-            {exampleMessages.map((example, index) => (
+            {examples.map((example) => (
               <motion.button
-                key={index}
-                onClick={() => setExampleMessage(example)}
-                className="text-left p-2 sm:p-3 text-xs sm:text-sm bg-muted/50 rounded-md hover:bg-muted transition-colors border border-border/50 line-clamp-2"
+                key={example.id}
+                onClick={() => setExampleMessage(example.text, example.id)}
+                className="text-left p-2 sm:p-3 text-xs sm:text-sm bg-muted/50 rounded-md hover:bg-muted transition-colors border border-border/50 line-clamp-3 relative group"
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
               >
-                "{example}"
+                <div className="flex items-start justify-between mb-1">
+                  <span className="text-xs text-muted-foreground capitalize">
+                    {example.channel && `📱 ${example.channel}`} • {example.category}
+                  </span>
+                  {example.useCount > 0 && (
+                    <Badge variant="outline" className="text-xs h-4 px-1">
+                      {example.useCount}x
+                    </Badge>
+                  )}
+                </div>
+                "{example.text}"
+                
+                {/* Hover tooltip showing why this example was selected */}
+                <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block z-10 bg-popover text-popover-foreground p-2 rounded-md shadow-md border text-xs max-w-xs">
+                  <div className="font-medium mb-1">Why this example?</div>
+                  <div className="space-y-1">
+                    {userPattern?.preferredChannels.includes(example.channel || '') && (
+                      <div>• Matches your preferred channel: {example.channel}</div>
+                    )}
+                    {userPattern?.commonEmotions.includes(example.emotion) && (
+                      <div>• Common emotion in your analysis: {example.emotion}</div>
+                    )}
+                    <div>• Effectiveness: {Math.round(example.effectiveness * 100)}%</div>
+                  </div>
+                </div>
               </motion.button>
             ))}
+          </div>
+          
+          <div className="text-xs text-muted-foreground mt-2 p-2 bg-blue-50 dark:bg-blue-950/30 rounded border border-blue-200 dark:border-blue-800">
+            {userPattern ? (
+              <>
+                🧠 <strong>Smart Examples:</strong> These examples are personalized based on your usage patterns. 
+                Preferred channels: {userPattern.preferredChannels.join(', ')} • 
+                Common emotions: {userPattern.commonEmotions.join(', ')} • 
+                Last updated: {lastUpdate.toLocaleTimeString()}
+              </>
+            ) : (
+              <>
+                💡 <strong>Tip:</strong> These examples represent common customer service scenarios. 
+                As you use the tool, examples will adapt to your specific needs and usage patterns.
+              </>
+            )}
           </div>
         </div>
 

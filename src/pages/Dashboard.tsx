@@ -369,6 +369,7 @@ export const Dashboard = () => {
                 isAnalyzing={isLoading}
                 result={currentResult}
                 getEmotionColor={getEmotionColor}
+                sentimentHistory={sentiments}
               />
             </motion.div>
 

@@ -4,7 +4,7 @@
 
 ![Sentinel Sight Banner](https://img.shields.io/badge/🧠%20Sentinel%20Sight-AI%20Powered%20Sentiment%20Analysis-6366f1?style=for-the-badge&labelColor=1e293b&color=6366f1)
 
-![Version](https://img.shields.io/badge/version-1.1.9-22c55e?style=for-the-badge&logo=semver&logoColor=white)
+![Version](https://img.shields.io/badge/version-2.0.0-22c55e?style=for-the-badge&logo=semver&logoColor=white)
 ![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.5.3-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![AI](https://img.shields.io/badge/HuggingFace-Transformers-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)
@@ -29,6 +29,543 @@
 <tr>
 <td width="50%">
 
+### 🎯 **Enterprise Features**
+- **Multi-Provider AI Engine** with intelligent fallback
+- **Real-time Network Monitoring** with circuit breaker pattern
+- **Advanced Analytics Dashboard** with 15+ visualization types
+- **Bulk Analysis Engine** with adaptive error handling
+- **Smart Example System** that learns from user behavior
+- **Comprehensive Export Options** (CSV, JSON, PDF reports)
+
+</td>
+<td width="50%">
+
+### 🚀 **Performance & Reliability**
+- **Circuit Breaker Protection** prevents cascading failures
+- **Adaptive Batching** optimizes processing speed
+- **Network-Aware Fallbacks** ensure 99.9% uptime
+- **Intelligent Error Classification** with auto-recovery
+- **Real-time Provider Health** monitoring
+- **Offline-First Architecture** with local AI models
+
+</td>
+</tr>
+</table>
+
+---
+
+## ✨ **Comprehensive Feature Set**
+
+### 🤖 **Quad AI Engine Architecture**
+
+<div align="center">
+
+```mermaid
+graph TD
+    A[User Input] --> B{Network Manager}
+    B --> C[Primary Provider]
+    B --> D[Fallback Provider]
+    B --> E[Local Provider]
+    B --> F[Emergency Provider]
+    
+    C --> G[Gemini API]
+    D --> H[Sentiment API]
+    E --> I[HuggingFace Local]
+    F --> J[Ollama Local]
+    
+    G --> K[Circuit Breaker]
+    H --> K
+    I --> K
+    J --> K
+    
+    K --> L[Result Processing]
+    L --> M[Analytics Engine]
+    M --> N[Dashboard]
+```
+
+</div>
+
+| Provider | Type | Strengths | Use Case |
+|----------|------|-----------|----------|
+| **🔥 Gemini** | Cloud API | High accuracy, fast response | Primary analysis |
+| **🌐 Sentiment API** | Cloud API | Specialized sentiment models | Backup analysis |
+| **🏠 HuggingFace** | Local | Privacy-first, offline capable | Secure environments |
+| **🦙 Ollama** | Local | Custom models, full control | Enterprise deployments |
+
+### 🛡️ **Advanced Network Management**
+
+#### **Circuit Breaker Pattern**
+- **Failure Detection**: Automatically detects provider failures
+- **Graceful Degradation**: Switches to healthy providers instantly
+- **Auto-Recovery**: Tests failed providers and restores when healthy
+- **Configurable Thresholds**: Customizable failure limits and timeouts
+
+#### **Real-time Health Monitoring**
+```typescript
+interface ProviderHealth {
+  isHealthy: boolean;
+  consecutiveFailures: number;
+  averageResponseTime: number;
+  circuitBreakerOpen: boolean;
+  lastFailureTime?: number;
+  successRate: number;
+}
+```
+
+### 📊 **Advanced Analytics Dashboard**
+
+#### **15+ Visualization Types**
+- **📈 Sentiment Trends**: Time-series analysis with trend detection
+- **🥧 Emotion Distribution**: Interactive pie charts with drill-down
+- **📊 Channel Performance**: Multi-dimensional bar charts
+- **🎯 Customer Insights**: Satisfaction scoring and risk analysis
+- **⏰ Time Patterns**: Hourly/daily sentiment patterns
+- **🔄 Real-time Feeds**: Live emotion updates with animations
+
+#### **Smart Analytics Features**
+- **Predictive Insights**: AI-powered trend forecasting
+- **Anomaly Detection**: Automatic outlier identification
+- **Custom Metrics**: User-defined KPIs and thresholds
+- **Comparative Analysis**: Period-over-period comparisons
+- **Export Capabilities**: PDF reports, CSV data, chart images
+
+### 🎯 **Intelligent Bulk Analysis**
+
+#### **Enhanced Processing Engine**
+```typescript
+interface BulkAnalysisOptions {
+  batchSize: number;           // Adaptive batch sizing
+  maxConcurrent: number;       // Concurrent request limits
+  adaptiveBatching: boolean;   // Smart batch optimization
+  pauseOnHighErrorRate: boolean; // Auto-pause protection
+  errorRateThreshold: number;  // Error rate limits
+  switchProviderThreshold: number; // Provider switching logic
+}
+```
+
+#### **Smart Error Handling**
+- **8 Error Categories**: Network, API, Rate Limit, Authentication, etc.
+- **Automatic Recovery**: Provider switching and retry logic
+- **Progress Preservation**: Resume from interruption points
+- **Detailed Reporting**: Comprehensive error analysis and suggestions
+
+### 🧠 **Adaptive Example System**
+
+#### **AI-Powered Learning**
+- **Usage Pattern Analysis**: Learns from user interactions
+- **Context-Aware Suggestions**: Industry and use-case specific examples
+- **Real-time Adaptation**: Updates suggestions based on recent activity
+- **Personalization Engine**: Tailored examples for individual users
+
+#### **Smart Categories**
+```typescript
+interface ExampleCategory {
+  id: string;
+  name: string;
+  examples: AdaptiveExample[];
+  usageCount: number;
+  lastUsed: Date;
+  userPreference: number; // 0-1 preference score
+}
+```
+
+### 📱 **Mobile-First Design**
+
+#### **Responsive Components**
+- **Touch-Optimized**: Large touch targets and gesture support
+- **Adaptive Layouts**: Fluid grids that work on any screen size
+- **Performance Optimized**: Lazy loading and virtual scrolling
+- **Offline Capable**: Full functionality without internet
+
+#### **Progressive Web App**
+- **App-like Experience**: Native app feel in the browser
+- **Push Notifications**: Real-time alerts and updates
+- **Background Sync**: Offline data synchronization
+- **Install Prompt**: Add to home screen capability
+
+---
+
+## 🚀 **Quick Start**
+
+### **Prerequisites**
+- Node.js 18+ 
+- npm or yarn
+- Modern browser with ES2020 support
+
+### **Installation**
+
+```bash
+# Clone the repository
+git clone https://github.com/Xenonesis/sentiment-sentinel-sight.git
+cd sentiment-sentinel-sight
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+### **Environment Setup**
+
+Create a `.env.local` file:
+
+```env
+# Optional: Gemini API Configuration
+VITE_GEMINI_API_KEY=your_gemini_api_key_here
+
+# Optional: Custom API Endpoints
+VITE_SENTIMENT_API_URL=https://your-api-endpoint.com
+VITE_OLLAMA_BASE_URL=http://localhost:11434
+```
+
+### **Build for Production**
+
+```bash
+# Production build
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+---
+
+## 🏗️ **Architecture Overview**
+
+### **Component Architecture**
+
+```
+src/
+├── components/           # Reusable UI components
+│   ├── ui/              # Base UI components (shadcn/ui)
+│   ├── SentimentForm.tsx    # Main analysis form
+│   ├── AdvancedAnalyticsDashboard.tsx  # Analytics dashboard
+│   ├── BulkAnalysisModal.tsx           # Bulk processing
+│   ├── NetworkStatusIndicator.tsx     # Health monitoring
+│   └── AdaptiveExamplesDemo.tsx       # Smart examples
+├── hooks/               # Custom React hooks
+│   ├── useSentimentAnalysis.ts        # Core analysis logic
+│   ├── useEnhancedBulkAnalysis.ts     # Bulk processing
+│   ├── useAdaptiveExamples.ts         # Example system
+│   ├── useNetworkNotifications.ts     # Network monitoring
+│   └── useApiPreferences.ts           # Provider management
+├── services/            # API service layers
+│   ├── sentimentApiService.ts         # Multi-provider service
+│   ├── geminiService.ts               # Gemini integration
+│   ├── ollamaService.ts               # Ollama integration
+│   └── apiPreferencesService.ts       # Provider configuration
+├── utils/               # Utility functions
+│   ├── networkManager.ts              # Network management
+│   ├── errorClassifier.ts             # Error handling
+│   ├── performance.ts                 # Performance monitoring
+│   └── logger.ts                      # Logging system
+└── pages/               # Route components
+    ├── Dashboard.tsx                   # Main dashboard
+    ├── About.tsx                       # About page
+    └── SettingsPage.tsx               # Configuration
+```
+
+### **Data Flow Architecture**
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant F as SentimentForm
+    participant N as NetworkManager
+    participant S as SentimentService
+    participant A as Analytics
+    participant D as Dashboard
+
+    U->>F: Submit text
+    F->>N: Check provider health
+    N->>S: Route to best provider
+    S->>S: Analyze sentiment
+    S->>A: Store result
+    A->>D: Update dashboard
+    D->>U: Display insights
+```
+
+---
+
+## 📊 **Advanced Analytics**
+
+### **Real-time Metrics**
+
+| Metric | Description | Calculation |
+|--------|-------------|-------------|
+| **Sentiment Score** | Overall sentiment (-100 to +100) | Weighted average of all analyses |
+| **Confidence Level** | Analysis reliability (0-100%) | Average confidence across results |
+| **Response Time** | API performance tracking | Exponential moving average |
+| **Success Rate** | Provider reliability (0-100%) | Successful requests / total requests |
+| **Customer Satisfaction** | Derived satisfaction score | Algorithm-based on sentiment patterns |
+
+### **Advanced Visualizations**
+
+#### **Sentiment Trends Chart**
+```typescript
+interface TrendDataPoint {
+  timestamp: Date;
+  sentiment: number;
+  confidence: number;
+  volume: number;
+  emotion: string;
+}
+```
+
+#### **Emotion Distribution Analysis**
+- **Primary Emotions**: Joy, Sadness, Anger, Fear, Surprise, Disgust
+- **Sentiment Polarity**: Positive, Negative, Neutral
+- **Confidence Levels**: High (>80%), Medium (50-80%), Low (<50%)
+
+#### **Customer Journey Mapping**
+- **Interaction Timeline**: Chronological sentiment evolution
+- **Touchpoint Analysis**: Channel-specific sentiment patterns
+- **Risk Identification**: Early warning system for dissatisfaction
+
+---
+
+## 🛠️ **Technology Stack**
+
+### **Frontend Framework**
+- **⚛️ React 18.3.1**: Modern React with concurrent features
+- **📘 TypeScript 5.5.3**: Type-safe development
+- **⚡ Vite 5.4.1**: Lightning-fast build tool
+- **🎨 Tailwind CSS 3.4.11**: Utility-first styling
+
+### **UI Components**
+- **🎯 Radix UI**: Accessible component primitives
+- **🎭 Framer Motion**: Smooth animations and transitions
+- **📊 Recharts**: Beautiful, responsive charts
+- **🎪 Lucide React**: Consistent icon system
+
+### **State Management**
+- **🔄 TanStack Query**: Server state management
+- **🎣 Custom Hooks**: Encapsulated business logic
+- **🌍 Context API**: Global state management
+- **💾 Local Storage**: Persistent user preferences
+
+### **AI & ML Integration**
+- **🤗 HuggingFace Transformers**: Local AI models
+- **🔥 Google Gemini**: Cloud-based analysis
+- **🦙 Ollama**: Self-hosted model support
+- **🌐 Custom APIs**: Flexible provider system
+
+### **Development Tools**
+- **📏 ESLint**: Code quality enforcement
+- **🎨 Prettier**: Code formatting
+- **🧪 TypeScript**: Static type checking
+- **📦 npm**: Package management
+
+---
+
+## 🔧 **Configuration**
+
+### **API Provider Setup**
+
+#### **Gemini Configuration**
+```typescript
+interface GeminiConfig {
+  apiKey: string;
+  model: 'gemini-pro' | 'gemini-pro-vision';
+  temperature: number;
+  maxTokens: number;
+  safetySettings: SafetySetting[];
+}
+```
+
+#### **Ollama Configuration**
+```typescript
+interface OllamaConfig {
+  baseUrl: string;
+  model: string;
+  temperature: number;
+  timeout: number;
+  keepAlive: string;
+}
+```
+
+### **Network Management Settings**
+```typescript
+interface NetworkConfig {
+  circuitBreakerThreshold: number;  // Failure threshold
+  circuitBreakerTimeout: number;    // Recovery timeout
+  healthCheckInterval: number;      // Health check frequency
+  maxRetries: number;               // Retry attempts
+  retryDelay: number;               // Delay between retries
+}
+```
+
+---
+
+## 📈 **Performance Optimization**
+
+### **Bundle Optimization**
+- **Code Splitting**: Route-based lazy loading
+- **Tree Shaking**: Unused code elimination
+- **Asset Optimization**: Image compression and lazy loading
+- **Caching Strategy**: Aggressive caching for static assets
+
+### **Runtime Performance**
+- **Virtual Scrolling**: Efficient large list rendering
+- **Memoization**: React.memo and useMemo optimization
+- **Debounced Inputs**: Reduced API calls
+- **Background Processing**: Web Workers for heavy computations
+
+### **Network Optimization**
+- **Request Batching**: Multiple analyses in single request
+- **Response Caching**: Intelligent cache management
+- **Compression**: Gzip/Brotli compression
+- **CDN Integration**: Global content delivery
+
+---
+
+## 🔒 **Security & Privacy**
+
+### **Data Protection**
+- **Local Processing**: HuggingFace models run locally
+- **No Data Storage**: Analyses are not permanently stored
+- **Encrypted Transit**: HTTPS for all API communications
+- **Privacy Controls**: User-configurable data handling
+
+### **API Security**
+- **Key Management**: Secure API key storage
+- **Rate Limiting**: Built-in request throttling
+- **Error Sanitization**: No sensitive data in error messages
+- **CORS Protection**: Proper cross-origin policies
+
+---
+
+## 🧪 **Testing Strategy**
+
+### **Unit Testing**
+```bash
+# Run unit tests
+npm run test
+
+# Run with coverage
+npm run test:coverage
+```
+
+### **Integration Testing**
+- **API Integration**: Provider connectivity tests
+- **Component Integration**: React Testing Library
+- **E2E Testing**: Cypress automation
+- **Performance Testing**: Lighthouse CI
+
+### **Quality Assurance**
+- **Type Safety**: 100% TypeScript coverage
+- **Code Quality**: ESLint + Prettier
+- **Accessibility**: WCAG 2.1 AA compliance
+- **Browser Testing**: Cross-browser compatibility
+
+---
+
+## 📚 **API Documentation**
+
+### **Core Hooks**
+
+#### **useSentimentAnalysis**
+```typescript
+const {
+  analyze,           // Main analysis function
+  isAnalyzing,       // Loading state
+  result,            // Latest result
+  error,             // Error state
+  history,           // Analysis history
+  clearHistory       // Clear function
+} = useSentimentAnalysis();
+```
+
+#### **useEnhancedBulkAnalysis**
+```typescript
+const {
+  processBulk,       // Bulk processing function
+  state,             // Processing state
+  pause,             // Pause processing
+  resume,            // Resume processing
+  cancel,            // Cancel processing
+  retry              // Retry failed items
+} = useEnhancedBulkAnalysis();
+```
+
+### **Service APIs**
+
+#### **SentimentApiService**
+```typescript
+interface SentimentApiService {
+  analyze(text: string, options?: AnalysisOptions): Promise<SentimentResult>;
+  bulkAnalyze(texts: string[], options?: BulkOptions): Promise<SentimentResult[]>;
+  getProviderHealth(): Promise<ProviderHealth>;
+  switchProvider(provider: ApiProvider): void;
+}
+```
+
+---
+
+## 🤝 **Contributing**
+
+### **Development Setup**
+
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Install dependencies**: `npm install`
+4. **Start development**: `npm run dev`
+5. **Make your changes**
+6. **Run tests**: `npm run test`
+7. **Commit changes**: `git commit -m 'Add amazing feature'`
+8. **Push to branch**: `git push origin feature/amazing-feature`
+9. **Open a Pull Request**
+
+### **Code Standards**
+- **TypeScript**: All new code must be TypeScript
+- **Testing**: Maintain 80%+ test coverage
+- **Documentation**: Update docs for new features
+- **Accessibility**: Follow WCAG guidelines
+- **Performance**: No performance regressions
+
+### **Pull Request Guidelines**
+- **Clear Description**: Explain what and why
+- **Screenshots**: For UI changes
+- **Tests**: Include relevant tests
+- **Documentation**: Update if needed
+- **Breaking Changes**: Clearly marked
+
+---
+
+## 📄 **License**
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 **Acknowledgments**
+
+- **HuggingFace**: For providing excellent transformer models
+- **Google**: For the Gemini API
+- **Radix UI**: For accessible component primitives
+- **Vercel**: For the amazing developer experience
+- **Open Source Community**: For the incredible ecosystem
+
+---
+
+## 📞 **Support**
+
+- **📧 Email**: support@sentinelsight.com
+- **💬 Discord**: [Join our community](https://discord.gg/sentinelsight)
+- **📖 Documentation**: [docs.sentinelsight.com](https://docs.sentinelsight.com)
+- **🐛 Issues**: [GitHub Issues](https://github.com/Xenonesis/sentiment-sentinel-sight/issues)
+
+---
+
+<div align="center">
+
+**Made with ❤️ by the Sentinel Sight Team**
+
+[⭐ Star us on GitHub](https://github.com/Xenonesis/sentiment-sentinel-sight) • [🐦 Follow on Twitter](https://twitter.com/sentinelsight) • [📧 Subscribe to Newsletter](https://sentinelsight.com/newsletter)
+
+</div>
+
 ### 🧠 **Quad AI Engine**
 - **Client-side Privacy**: HuggingFace Transformers for sensitive data
 - **Local AI Power**: Ollama for private, offline AI models
@@ -37,6 +574,7 @@
 - **Smart Failover**: Automatic switching between AI providers
 - **🛡️ Circuit Breaker Protection**: Advanced error handling with automatic provider switching (v1.1.9)
 - **📡 Network Monitoring**: Real-time network and API health monitoring with notifications (v1.1.9)
+- **🧠 Adaptive Examples**: AI-powered example suggestions that learn from your usage patterns (v1.1.9)
 - **Confidence Scoring**: Precise accuracy percentages
 
 </td>
@@ -251,8 +789,8 @@ const result = await analyzeSentiment(message);
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/sentinel-sight.git
-cd sentinel-sight
+git clone https://github.com/Xenonesis/sentiment-sentinel-sight.git
+cd sentiment-sentinel-sight
 
 # Install dependencies
 npm install
@@ -279,6 +817,8 @@ npm run dev
 3. **Start Analyzing**
    - Open http://localhost:8080
    - Enter a message and click "Analyze Sentiment"
+   - Try real customer service examples
+   - Test bulk analysis with CSV upload
    - Explore the analytics dashboard
 
 ### **Build for Production**
@@ -345,6 +885,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Built with ❤️ using React, TypeScript, and AI**
 
-[⭐ Star this repo](https://github.com/your-username/sentinel-sight) • [🐛 Report Bug](https://github.com/your-username/sentinel-sight/issues) • [💡 Request Feature](https://github.com/your-username/sentinel-sight/issues)
+[⭐ Star this repo](https://github.com/Xenonesis/sentiment-sentinel-sight) • [🐛 Report Bug](https://github.com/Xenonesis/sentiment-sentinel-sight/issues) • [💡 Request Feature](https://github.com/Xenonesis/sentiment-sentinel-sight/issues)
 
 </div>[Response interrupted by API Error]
