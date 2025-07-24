@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { logger } from '@/utils/logger';
 import { motion } from 'framer-motion';
-import { Settings, Key, Save, Eye, EyeOff, CheckCircle, AlertCircle, Database, Trash2, Download, X, CloudLightning, RotateCcw, Sliders } from 'lucide-react';
+import { Settings, Key, Save, Eye, EyeOff, CheckCircle, AlertCircle, Database, Trash2, Download, X, CloudLightning, RotateCcw, Sliders, ChevronLeft, Menu } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,8 +15,20 @@ import { useToast } from '@/hooks/use-toast';
 import { usePersistedSentiments } from '@/hooks/usePersistedSentiments';
 import { useDataExport } from '@/hooks/useDataExport';
 import { useUserSettings } from '@/hooks/useUserSettings';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useResponsive } from '@/hooks/useResponsive';
 import { ApiPreferencesTab } from '@/components/ApiPreferencesTab';
 import { AdvancedSettingsTab } from '@/components/AdvancedSettingsTab';
+import { 
+  getResponsiveSpacing, 
+  getResponsiveGap, 
+  getResponsiveButtonSize, 
+  getTouchFriendlyClasses,
+  getResponsiveCardPadding,
+  getResponsiveTextSize,
+  getResponsiveIconSize,
+  getResponsiveHeaderPadding
+} from '@/utils/mobileOptimizations';
 import { ApiProvider } from '@/services/apiPreferencesService';
 import { 
   getOllamaModels, 
@@ -33,6 +45,11 @@ interface SettingsPageProps {
 }
 
 export const SettingsPage = ({ onClose }: SettingsPageProps) => {
+  // Responsive state
+  const isMobile = useIsMobile();
+  const { device } = useResponsive();
+  const [activeTab, setActiveTab] = useState('preferences');
+  
   // Gemini API settings
   const [geminiApiKey, setGeminiApiKey] = useState('');
   const [showGeminiKey, setShowGeminiKey] = useState(false);
@@ -59,6 +76,14 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
   const { sentiments, clearHistory, getStorageInfo } = usePersistedSentiments();
   const { exportData } = useDataExport();
   const { settings: userSettings, updateFormSettings, updateUISettings, updateAnalysisSettings, clearFormData, resetSettings } = useUserSettings();
+
+  // Tab configuration for better mobile experience
+  const tabs = [
+    { id: 'preferences', label: 'Preferences', shortLabel: 'Prefs', icon: Settings },
+    { id: 'api', label: 'API Keys', shortLabel: 'APIs', icon: Key },
+    { id: 'advanced', label: 'Advanced', shortLabel: 'Adv', icon: Sliders },
+    { id: 'data', label: 'Data', shortLabel: 'Data', icon: Database }
+  ];
 
   useEffect(() => {
     // Load saved API keys from localStorage
@@ -352,275 +377,330 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-1 sm:p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="w-full max-w-3xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-4xl h-[98vh] sm:h-[95vh] lg:h-[90vh] overflow-hidden flex flex-col"
       >
-        <Card className="bg-gradient-card border-border/50 shadow-glow">
-          <CardHeader className="flex flex-row items-center justify-between">
+        <Card className="bg-gradient-card border-border/50 shadow-glow flex flex-col h-full">
+          <CardHeader className={`flex flex-row items-center justify-between ${getResponsiveHeaderPadding()} flex-shrink-0`}>
             <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5 text-primary" />
-              Settings
+              <Settings className={`${getResponsiveIconSize('md')} text-primary`} />
+              <span className={getResponsiveTextSize('lg')}>Settings</span>
             </CardTitle>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-4 w-4" />
+            <Button 
+              variant="ghost" 
+              size={isMobile ? "default" : "sm"} 
+              onClick={onClose}
+              className={getTouchFriendlyClasses()}
+            >
+              <X className={getResponsiveIconSize('sm')} />
             </Button>
           </CardHeader>
-          <CardContent className="p-3 sm:p-6">
-            <Tabs defaultValue="preferences" className="space-y-4 sm:space-y-6">
-              <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 gap-1">
-                <TabsTrigger value="preferences" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                  <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="hidden sm:inline">Preferences</span>
-                  <span className="sm:hidden">Prefs</span>
-                </TabsTrigger>
-                <TabsTrigger value="api" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                  <Key className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="hidden sm:inline">Gemini API</span>
-                  <span className="sm:hidden">Gemini</span>
-                </TabsTrigger>
-                <TabsTrigger value="advanced" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                  <Sliders className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="hidden sm:inline">Advanced</span>
-                  <span className="sm:hidden">Adv</span>
-                </TabsTrigger>
-                <TabsTrigger value="ollama" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                  <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="hidden sm:inline">Ollama</span>
-                  <span className="sm:hidden">Local</span>
-                </TabsTrigger>
-                <TabsTrigger value="sentiment" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                  <CloudLightning className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="hidden sm:inline">Sentiment API</span>
-                  <span className="sm:hidden">API</span>
-                </TabsTrigger>
-                <TabsTrigger value="data" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                  <Database className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="hidden sm:inline">Data Management</span>
-                  <span className="sm:hidden">Data</span>
-                </TabsTrigger>
-              </TabsList>
+          <CardContent className={`${getResponsiveCardPadding()} flex-1 overflow-hidden`}>
+            <Tabs defaultValue="preferences" className={`${getResponsiveGap('md')} flex flex-col h-full`}>
+              {/* Mobile: Scrollable horizontal tabs, Desktop: Grid layout */}
+              <div className="flex-shrink-0">
+                {isMobile ? (
+                  <div className="overflow-x-auto pb-2">
+                    <TabsList className="flex w-max min-w-full gap-1 p-1">
+                      <TabsTrigger value="preferences" className={`flex items-center gap-2 ${getTouchFriendlyClasses()} px-3 py-2 text-sm whitespace-nowrap`}>
+                        <Settings className="h-4 w-4" />
+                        Preferences
+                      </TabsTrigger>
+                      <TabsTrigger value="api" className={`flex items-center gap-2 ${getTouchFriendlyClasses()} px-3 py-2 text-sm whitespace-nowrap`}>
+                        <Key className="h-4 w-4" />
+                        Gemini API
+                      </TabsTrigger>
+                      <TabsTrigger value="advanced" className={`flex items-center gap-2 ${getTouchFriendlyClasses()} px-3 py-2 text-sm whitespace-nowrap`}>
+                        <Sliders className="h-4 w-4" />
+                        Advanced
+                      </TabsTrigger>
+                      <TabsTrigger value="ollama" className={`flex items-center gap-2 ${getTouchFriendlyClasses()} px-3 py-2 text-sm whitespace-nowrap`}>
+                        <Settings className="h-4 w-4" />
+                        Ollama
+                      </TabsTrigger>
+                      <TabsTrigger value="sentiment" className={`flex items-center gap-2 ${getTouchFriendlyClasses()} px-3 py-2 text-sm whitespace-nowrap`}>
+                        <CloudLightning className="h-4 w-4" />
+                        Sentiment API
+                      </TabsTrigger>
+                      <TabsTrigger value="data" className={`flex items-center gap-2 ${getTouchFriendlyClasses()} px-3 py-2 text-sm whitespace-nowrap`}>
+                        <Database className="h-4 w-4" />
+                        Data
+                      </TabsTrigger>
+                    </TabsList>
+                  </div>
+                ) : (
+                  <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 gap-1">
+                    <TabsTrigger value="preferences" className="flex items-center gap-2 text-sm">
+                      <Settings className="h-4 w-4" />
+                      <span className="hidden lg:inline">Preferences</span>
+                      <span className="lg:hidden">Prefs</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="api" className="flex items-center gap-2 text-sm">
+                      <Key className="h-4 w-4" />
+                      <span className="hidden lg:inline">Gemini API</span>
+                      <span className="lg:hidden">Gemini</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="advanced" className="flex items-center gap-2 text-sm">
+                      <Sliders className="h-4 w-4" />
+                      <span className="hidden lg:inline">Advanced</span>
+                      <span className="lg:hidden">Adv</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="ollama" className="flex items-center gap-2 text-sm">
+                      <Settings className="h-4 w-4" />
+                      <span className="hidden lg:inline">Ollama</span>
+                      <span className="lg:hidden">Local</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="sentiment" className="flex items-center gap-2 text-sm">
+                      <CloudLightning className="h-4 w-4" />
+                      <span className="hidden lg:inline">Sentiment API</span>
+                      <span className="lg:hidden">API</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="data" className="flex items-center gap-2 text-sm">
+                      <Database className="h-4 w-4" />
+                      <span className="hidden lg:inline">Data Management</span>
+                      <span className="lg:hidden">Data</span>
+                    </TabsTrigger>
+                  </TabsList>
+                )}
+              </div>
 
-              <TabsContent value="preferences" className="space-y-6">
-                {/* User Preferences Section */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Settings className="h-5 w-5" />
-                      User Preferences
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Form Data Settings */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">Form Data</h3>
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-medium">Remember Form Data</Label>
-                          <p className="text-xs text-muted-foreground">
-                            Automatically save and restore customer ID, channel, and message content
-                          </p>
+              <div className="flex-1 overflow-y-auto min-h-0">
+                <TabsContent value="preferences" className={`${getResponsiveGap('lg')} space-y-4 sm:space-y-6 pb-6`}>
+                  {/* User Preferences Section */}
+                  <Card>
+                    <CardHeader className={getResponsiveHeaderPadding()}>
+                      <CardTitle className="flex items-center gap-2">
+                        <Settings className={getResponsiveIconSize('md')} />
+                        <span className={getResponsiveTextSize('lg')}>User Preferences</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className={`${getResponsiveCardPadding()} ${getResponsiveGap('lg')}`}>
+                      {/* Form Data Settings */}
+                      <div className={getResponsiveGap('md')}>
+                        <h3 className={`${getResponsiveTextSize('lg')} font-semibold`}>Form Data</h3>
+                        <div className={`flex ${isMobile ? 'flex-col gap-3' : 'items-center justify-between'}`}>
+                          <div className={getResponsiveGap('xs')}>
+                            <Label className={`${getResponsiveTextSize('sm')} font-medium`}>Remember Form Data</Label>
+                            <p className={`${getResponsiveTextSize('xs')} text-muted-foreground`}>
+                              Automatically save and restore customer ID, channel, and message content
+                            </p>
+                          </div>
+                          <div className={`${isMobile ? 'self-start' : ''}`}>
+                            <Switch
+                              checked={userSettings.form.rememberFormData}
+                              onCheckedChange={(checked) => updateFormSettings({ rememberFormData: checked })}
+                            />
+                          </div>
                         </div>
-                        <Switch
-                          checked={userSettings.form.rememberFormData}
-                          onCheckedChange={(checked) => updateFormSettings({ rememberFormData: checked })}
-                        />
-                      </div>
                       
-                      {userSettings.form.rememberFormData && (
-                        <div className="pl-4 border-l-2 border-muted space-y-3">
-                          <div className="text-sm">
-                            <strong>Last Customer ID:</strong> {userSettings.form.lastCustomerId || 'None'}
+                        {userSettings.form.rememberFormData && (
+                          <div className={`${isMobile ? 'pl-2 border-l-2' : 'pl-4 border-l-2'} border-muted ${getResponsiveGap('sm')}`}>
+                            <div className={getResponsiveTextSize('sm')}>
+                              <strong>Last Customer ID:</strong> {userSettings.form.lastCustomerId || 'None'}
+                            </div>
+                            <div className={getResponsiveTextSize('sm')}>
+                              <strong>Last Channel:</strong> {userSettings.form.lastChannel || 'None'}
+                            </div>
+                            <div className={getResponsiveTextSize('sm')}>
+                              <strong>Last Message:</strong> {userSettings.form.lastMessage ? 
+                                `${userSettings.form.lastMessage.substring(0, isMobile ? 30 : 50)}${userSettings.form.lastMessage.length > (isMobile ? 30 : 50) ? '...' : ''}` : 'None'}
+                            </div>
+                            <Button 
+                              variant="outline" 
+                              size={isMobile ? "default" : "sm"}
+                              onClick={clearFormData}
+                              className={`mt-2 ${getTouchFriendlyClasses()}`}
+                            >
+                              <Trash2 className={`${getResponsiveIconSize('sm')} mr-2`} />
+                              <span className={getResponsiveTextSize('sm')}>Clear Saved Form Data</span>
+                            </Button>
                           </div>
-                          <div className="text-sm">
-                            <strong>Last Channel:</strong> {userSettings.form.lastChannel || 'None'}
+                        )}
+                    </div>
+
+                    <Separator />
+
+                      {/* UI Settings */}
+                      <div className={getResponsiveGap('md')}>
+                        <h3 className={`${getResponsiveTextSize('lg')} font-semibold`}>Interface</h3>
+                        
+                        <div className={`flex ${isMobile ? 'flex-col gap-3' : 'items-center justify-between'}`}>
+                          <div className={getResponsiveGap('xs')}>
+                            <Label className={`${getResponsiveTextSize('sm')} font-medium`}>Auto-save Results</Label>
+                            <p className={`${getResponsiveTextSize('xs')} text-muted-foreground`}>
+                              Automatically save analysis results to history
+                            </p>
                           </div>
-                          <div className="text-sm">
-                            <strong>Last Message:</strong> {userSettings.form.lastMessage ? 
-                              `${userSettings.form.lastMessage.substring(0, 50)}${userSettings.form.lastMessage.length > 50 ? '...' : ''}` : 'None'}
+                          <div className={`${isMobile ? 'self-start' : ''}`}>
+                            <Switch
+                              checked={userSettings.ui.autoSaveResults}
+                              onCheckedChange={(checked) => updateUISettings({ autoSaveResults: checked })}
+                            />
+                          </div>
+                        </div>
+
+                        <div className={`flex ${isMobile ? 'flex-col gap-3' : 'items-center justify-between'}`}>
+                          <div className={getResponsiveGap('xs')}>
+                            <Label className={`${getResponsiveTextSize('sm')} font-medium`}>Show Tooltips</Label>
+                            <p className={`${getResponsiveTextSize('xs')} text-muted-foreground`}>
+                              Display helpful tooltips throughout the interface
+                            </p>
+                          </div>
+                          <div className={`${isMobile ? 'self-start' : ''}`}>
+                            <Switch
+                              checked={userSettings.ui.showTooltips}
+                              onCheckedChange={(checked) => updateUISettings({ showTooltips: checked })}
+                            />
+                          </div>
+                        </div>
+
+                        <div className={`flex ${isMobile ? 'flex-col gap-3' : 'items-center justify-between'}`}>
+                          <div className={getResponsiveGap('xs')}>
+                            <Label className={`${getResponsiveTextSize('sm')} font-medium`}>Compact Mode</Label>
+                            <p className={`${getResponsiveTextSize('xs')} text-muted-foreground`}>
+                              Use a more compact layout to fit more content
+                            </p>
+                          </div>
+                          <div className={`${isMobile ? 'self-start' : ''}`}>
+                            <Switch
+                              checked={userSettings.ui.compactMode}
+                              onCheckedChange={(checked) => updateUISettings({ compactMode: checked })}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                    <Separator />
+
+                      {/* Analysis Settings */}
+                      <div className={getResponsiveGap('md')}>
+                        <h3 className={`${getResponsiveTextSize('lg')} font-semibold`}>Analysis Defaults</h3>
+                        
+                        <div className={`flex ${isMobile ? 'flex-col gap-3' : 'items-center justify-between'}`}>
+                          <div className={getResponsiveGap('xs')}>
+                            <Label className={`${getResponsiveTextSize('sm')} font-medium`}>Auto-analyze on Paste</Label>
+                            <p className={`${getResponsiveTextSize('xs')} text-muted-foreground`}>
+                              Automatically analyze text when pasted into the message field
+                            </p>
+                          </div>
+                          <div className={`${isMobile ? 'self-start' : ''}`}>
+                            <Switch
+                              checked={userSettings.analysis.autoAnalyzeOnPaste}
+                              onCheckedChange={(checked) => updateAnalysisSettings({ autoAnalyzeOnPaste: checked })}
+                            />
+                          </div>
+                        </div>
+
+                        <div className={`flex ${isMobile ? 'flex-col gap-3' : 'items-center justify-between'}`}>
+                          <div className={getResponsiveGap('xs')}>
+                            <Label className={`${getResponsiveTextSize('sm')} font-medium`}>Show Detailed Results</Label>
+                            <p className={`${getResponsiveTextSize('xs')} text-muted-foreground`}>
+                              Display additional analysis details and confidence scores
+                            </p>
+                          </div>
+                          <div className={`${isMobile ? 'self-start' : ''}`}>
+                            <Switch
+                              checked={userSettings.analysis.showDetailedResults}
+                              onCheckedChange={(checked) => updateAnalysisSettings({ showDetailedResults: checked })}
+                            />
+                          </div>
+                        </div>
+
+                        <div className={`flex ${isMobile ? 'flex-col gap-3' : 'items-center justify-between'}`}>
+                          <div className={getResponsiveGap('xs')}>
+                            <Label className={`${getResponsiveTextSize('sm')} font-medium`}>Enable Batch Mode</Label>
+                            <p className={`${getResponsiveTextSize('xs')} text-muted-foreground`}>
+                              Allow processing multiple messages at once
+                            </p>
+                          </div>
+                          <div className={`${isMobile ? 'self-start' : ''}`}>
+                            <Switch
+                              checked={userSettings.analysis.enableBatchMode}
+                              onCheckedChange={(checked) => updateAnalysisSettings({ enableBatchMode: checked })}
+                            />
+                          </div>
+                        </div>
+
+                        <div className={getResponsiveGap('sm')}>
+                          <Label className={`${getResponsiveTextSize('sm')} font-medium`}>Confidence Threshold</Label>
+                          <p className={`${getResponsiveTextSize('xs')} text-muted-foreground mb-2`}>
+                            Minimum confidence level for analysis results (0.1 - 1.0)
+                          </p>
+                          <div className={`flex items-center ${getResponsiveGap('md')}`}>
+                            <input
+                              type="range"
+                              min="0.1"
+                              max="1.0"
+                              step="0.1"
+                              value={userSettings.analysis.defaultConfidenceThreshold}
+                              onChange={(e) => updateAnalysisSettings({ defaultConfidenceThreshold: parseFloat(e.target.value) })}
+                              className={`flex-1 ${getTouchFriendlyClasses()}`}
+                            />
+                            <Badge variant="outline" className={`min-w-[60px] text-center ${getResponsiveTextSize('sm')}`}>
+                              {(userSettings.analysis.defaultConfidenceThreshold * 100).toFixed(0)}%
+                            </Badge>
+                          </div>
+                        </div>
+
+                        <div className={getResponsiveGap('sm')}>
+                          <Label className={`${getResponsiveTextSize('sm')} font-medium`}>Max History Items</Label>
+                          <p className={`${getResponsiveTextSize('xs')} text-muted-foreground mb-2`}>
+                            Maximum number of analysis results to keep in history
+                          </p>
+                          <div className={`flex items-center ${getResponsiveGap('md')}`}>
+                            <input
+                              type="range"
+                              min="100"
+                              max="5000"
+                              step="100"
+                              value={userSettings.analysis.maxHistoryItems}
+                              onChange={(e) => updateAnalysisSettings({ maxHistoryItems: parseInt(e.target.value) })}
+                              className={`flex-1 ${getTouchFriendlyClasses()}`}
+                            />
+                            <Badge variant="outline" className={`min-w-[80px] text-center ${getResponsiveTextSize('sm')}`}>
+                              {userSettings.analysis.maxHistoryItems}
+                            </Badge>
+                          </div>
+                        </div>
+                    </div>
+
+                    <Separator />
+
+                      {/* Reset Settings */}
+                      <div className={getResponsiveGap('md')}>
+                        <h3 className={`${getResponsiveTextSize('lg')} font-semibold`}>Reset</h3>
+                        <div className={`flex ${isMobile ? 'flex-col gap-3' : 'items-center justify-between'}`}>
+                          <div className={getResponsiveGap('xs')}>
+                            <Label className={`${getResponsiveTextSize('sm')} font-medium`}>Reset All Preferences</Label>
+                            <p className={`${getResponsiveTextSize('xs')} text-muted-foreground`}>
+                              Reset all user preferences to default values
+                            </p>
                           </div>
                           <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={clearFormData}
-                            className="mt-2"
+                            variant="destructive" 
+                            size={isMobile ? "default" : "sm"}
+                            onClick={() => {
+                              if (confirm('Are you sure you want to reset all preferences? This cannot be undone.')) {
+                                resetSettings();
+                                toast({
+                                  title: "Preferences Reset",
+                                  description: "All user preferences have been reset to defaults."
+                                });
+                              }
+                            }}
+                            className={`${getTouchFriendlyClasses()} ${isMobile ? 'self-start' : ''}`}
                           >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Clear Saved Form Data
+                            <RotateCcw className={`${getResponsiveIconSize('sm')} mr-2`} />
+                            <span className={getResponsiveTextSize('sm')}>Reset Preferences</span>
                           </Button>
                         </div>
-                      )}
-                    </div>
-
-                    <Separator />
-
-                    {/* UI Settings */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">Interface</h3>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-medium">Auto-save Results</Label>
-                          <p className="text-xs text-muted-foreground">
-                            Automatically save analysis results to history
-                          </p>
-                        </div>
-                        <Switch
-                          checked={userSettings.ui.autoSaveResults}
-                          onCheckedChange={(checked) => updateUISettings({ autoSaveResults: checked })}
-                        />
                       </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-medium">Show Tooltips</Label>
-                          <p className="text-xs text-muted-foreground">
-                            Display helpful tooltips throughout the interface
-                          </p>
-                        </div>
-                        <Switch
-                          checked={userSettings.ui.showTooltips}
-                          onCheckedChange={(checked) => updateUISettings({ showTooltips: checked })}
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-medium">Compact Mode</Label>
-                          <p className="text-xs text-muted-foreground">
-                            Use a more compact layout to fit more content
-                          </p>
-                        </div>
-                        <Switch
-                          checked={userSettings.ui.compactMode}
-                          onCheckedChange={(checked) => updateUISettings({ compactMode: checked })}
-                        />
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    {/* Analysis Settings */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">Analysis Defaults</h3>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-medium">Auto-analyze on Paste</Label>
-                          <p className="text-xs text-muted-foreground">
-                            Automatically analyze text when pasted into the message field
-                          </p>
-                        </div>
-                        <Switch
-                          checked={userSettings.analysis.autoAnalyzeOnPaste}
-                          onCheckedChange={(checked) => updateAnalysisSettings({ autoAnalyzeOnPaste: checked })}
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-medium">Show Detailed Results</Label>
-                          <p className="text-xs text-muted-foreground">
-                            Display additional analysis details and confidence scores
-                          </p>
-                        </div>
-                        <Switch
-                          checked={userSettings.analysis.showDetailedResults}
-                          onCheckedChange={(checked) => updateAnalysisSettings({ showDetailedResults: checked })}
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-medium">Enable Batch Mode</Label>
-                          <p className="text-xs text-muted-foreground">
-                            Allow processing multiple messages at once
-                          </p>
-                        </div>
-                        <Switch
-                          checked={userSettings.analysis.enableBatchMode}
-                          onCheckedChange={(checked) => updateAnalysisSettings({ enableBatchMode: checked })}
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Confidence Threshold</Label>
-                        <p className="text-xs text-muted-foreground mb-2">
-                          Minimum confidence level for analysis results (0.1 - 1.0)
-                        </p>
-                        <div className="flex items-center space-x-4">
-                          <input
-                            type="range"
-                            min="0.1"
-                            max="1.0"
-                            step="0.1"
-                            value={userSettings.analysis.defaultConfidenceThreshold}
-                            onChange={(e) => updateAnalysisSettings({ defaultConfidenceThreshold: parseFloat(e.target.value) })}
-                            className="flex-1"
-                          />
-                          <Badge variant="outline" className="min-w-[60px] text-center">
-                            {(userSettings.analysis.defaultConfidenceThreshold * 100).toFixed(0)}%
-                          </Badge>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Max History Items</Label>
-                        <p className="text-xs text-muted-foreground mb-2">
-                          Maximum number of analysis results to keep in history
-                        </p>
-                        <div className="flex items-center space-x-4">
-                          <input
-                            type="range"
-                            min="100"
-                            max="5000"
-                            step="100"
-                            value={userSettings.analysis.maxHistoryItems}
-                            onChange={(e) => updateAnalysisSettings({ maxHistoryItems: parseInt(e.target.value) })}
-                            className="flex-1"
-                          />
-                          <Badge variant="outline" className="min-w-[80px] text-center">
-                            {userSettings.analysis.maxHistoryItems}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    {/* Reset Settings */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">Reset</h3>
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-medium">Reset All Preferences</Label>
-                          <p className="text-xs text-muted-foreground">
-                            Reset all user preferences to default values
-                          </p>
-                        </div>
-                        <Button 
-                          variant="destructive" 
-                          size="sm" 
-                          onClick={() => {
-                            if (confirm('Are you sure you want to reset all preferences? This cannot be undone.')) {
-                              resetSettings();
-                              toast({
-                                title: "Preferences Reset",
-                                description: "All user preferences have been reset to defaults."
-                              });
-                            }
-                          }}
-                        >
-                          <RotateCcw className="h-4 w-4 mr-2" />
-                          Reset Preferences
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
 
                 {/* API Preferences Section */}
                 <ApiPreferencesTab 
@@ -646,45 +726,45 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
                 />
               </TabsContent>
 
-              <TabsContent value="advanced" className="space-y-6">
-                <AdvancedSettingsTab />
-              </TabsContent>
+                <TabsContent value="advanced" className={`${getResponsiveGap('lg')} space-y-4 sm:space-y-6 pb-6`}>
+                  <AdvancedSettingsTab />
+                </TabsContent>
 
-              <TabsContent value="api" className="space-y-6">
-                {/* API Key Section */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Key className="h-4 w-4 text-primary" />
-                    <h3 className="text-lg font-semibold">Google Gemini API Key</h3>
-                  </div>
-                  
-                  <Alert className="bg-muted/30 border-border/50">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      Enter your Google Gemini API key to enable sentiment analysis with Gemini 2.0 Flash when HuggingFace models are unavailable. 
-                      Get your free API key at <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google AI Studio</a>.
-                    </AlertDescription>
-                  </Alert>
+                <TabsContent value="api" className={`${getResponsiveGap('lg')} space-y-4 sm:space-y-6 pb-6`}>
+                  {/* API Key Section */}
+                  <div className={getResponsiveGap('md')}>
+                    <div className="flex items-center gap-2">
+                      <Key className={`${getResponsiveIconSize('sm')} text-primary`} />
+                      <h3 className={`${getResponsiveTextSize('lg')} font-semibold`}>Google Gemini API Key</h3>
+                    </div>
+                    
+                    <Alert className="bg-muted/30 border-border/50">
+                      <AlertCircle className={getResponsiveIconSize('sm')} />
+                      <AlertDescription className={getResponsiveTextSize('sm')}>
+                        Enter your Google Gemini API key to enable sentiment analysis with Gemini 2.0 Flash when HuggingFace models are unavailable. 
+                        Get your free API key at <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google AI Studio</a>.
+                      </AlertDescription>
+                    </Alert>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="geminiKey">API Key</Label>
-                    <div className="flex gap-2">
-                      <div className="relative flex-1">
-                        <Input
-                          id="geminiKey"
-                          type={showGeminiKey ? "text" : "password"}
-                          value={geminiApiKey}
-                          onChange={(e) => setGeminiApiKey(e.target.value)}
-                          placeholder="Enter your Gemini API key..."
-                          className="pr-10"
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                          onClick={() => setShowGeminiKey(!showGeminiKey)}
-                        >
+                    <div className={getResponsiveGap('sm')}>
+                      <Label htmlFor="geminiKey" className={getResponsiveTextSize('sm')}>API Key</Label>
+                      <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} ${getResponsiveGap('sm')}`}>
+                        <div className="relative flex-1">
+                          <Input
+                            id="geminiKey"
+                            type={showGeminiKey ? "text" : "password"}
+                            value={geminiApiKey}
+                            onChange={(e) => setGeminiApiKey(e.target.value)}
+                            placeholder="Enter your Gemini API key..."
+                            className={`pr-10 ${getTouchFriendlyClasses()}`}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className={`absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent ${getTouchFriendlyClasses()}`}
+                            onClick={() => setShowGeminiKey(!showGeminiKey)}
+                          >
                           {showGeminiKey ? (
                             <EyeOff className="h-4 w-4" />
                           ) : (
@@ -709,7 +789,7 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
                     <Button
                       onClick={saveGeminiApiKey}
                       disabled={isTestingGeminiKey || !geminiApiKey.trim()}
-                      className="bg-gradient-sentiment"
+                      className={`bg-gradient-sentiment ${getTouchFriendlyClasses()}`}
                     >
                       {isTestingGeminiKey ? (
                         <>
@@ -718,14 +798,14 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
                             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                             className="mr-2"
                           >
-                            <Save className="h-4 w-4" />
+                            <Save className={getResponsiveIconSize('sm')} />
                           </motion.div>
-                          Testing...
+                          <span className={getResponsiveTextSize('sm')}>Testing...</span>
                         </>
                       ) : (
                         <>
-                          <Save className="mr-2 h-4 w-4" />
-                          Save & Test
+                          <Save className={`mr-2 ${getResponsiveIconSize('sm')}`} />
+                          <span className={getResponsiveTextSize('sm')}>Save & Test</span>
                         </>
                       )}
                     </Button>
@@ -734,19 +814,20 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
                       <Button
                         variant="outline"
                         onClick={clearGeminiApiKey}
+                        className={getTouchFriendlyClasses()}
                       >
-                        Clear
+                        <span className={getResponsiveTextSize('sm')}>Clear</span>
                       </Button>
                     )}
                   </div>
                 </div>
 
                 {/* How it Works */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">How it Works</h3>
+                <div className={getResponsiveGap('md')}>
+                  <h3 className={`${getResponsiveTextSize('lg')} font-semibold`}>How it Works</h3>
                   <div className="bg-muted/30 p-4 rounded-lg border border-border/50">
-                    <p className="text-sm text-muted-foreground mb-3">Dual AI Engine Fallback System:</p>
-                    <div className="space-y-1 text-sm">
+                    <p className={`${getResponsiveTextSize('sm')} text-muted-foreground mb-3`}>Dual AI Engine Fallback System:</p>
+                    <div className={`space-y-2 ${getResponsiveTextSize('sm')}`}>
                       <p>1. The app first tries to use the HuggingFace model for sentiment analysis</p>
                       <p>2. If that fails, it automatically falls back to Google Gemini 2.0 Flash (if configured)</p>
                       <p>3. Gemini 2.0 Flash provides detailed emotion analysis similar to the original model</p>
@@ -755,18 +836,18 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
                 </div>
               </TabsContent>
 
-              <TabsContent value="ollama" className="space-y-6">
+              <TabsContent value="ollama" className={`${getResponsiveGap('lg')} space-y-4 sm:space-y-6 pb-6`}>
                 {/* Ollama Configuration Section */}
-                <div className="space-y-4">
+                <div className={getResponsiveGap('md')}>
                   <div className="flex items-center gap-2">
-                    <Settings className="h-4 w-4 text-primary" />
-                    <h3 className="text-lg font-semibold">Ollama Local AI Models</h3>
+                    <Settings className={`${getResponsiveIconSize('sm')} text-primary`} />
+                    <h3 className={`${getResponsiveTextSize('lg')} font-semibold`}>Ollama Local AI Models</h3>
                   </div>
                   
                   {!ollamaAvailable ? (
                     <Alert className="bg-muted/30 border-border/50">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>
+                      <AlertCircle className={getResponsiveIconSize('sm')} />
+                      <AlertDescription className={getResponsiveTextSize('sm')}>
                         Ollama is not running or not installed. Please install and start Ollama to use local AI models.
                         <br />
                         <a href="https://ollama.ai" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
@@ -911,25 +992,25 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
                 </div>
               </TabsContent>
 
-              <TabsContent value="sentiment" className="space-y-6">
+              <TabsContent value="sentiment" className={`${getResponsiveGap('lg')} space-y-4 sm:space-y-6 pb-6`}>
                 {/* Sentiment API Key Section */}
-                <div className="space-y-4">
+                <div className={getResponsiveGap('md')}>
                   <div className="flex items-center gap-2">
-                    <CloudLightning className="h-4 w-4 text-primary" />
-                    <h3 className="text-lg font-semibold">Sentiment Analysis API Key</h3>
+                    <CloudLightning className={`${getResponsiveIconSize('sm')} text-primary`} />
+                    <h3 className={`${getResponsiveTextSize('lg')} font-semibold`}>Sentiment Analysis API Key</h3>
                   </div>
                   
                   <Alert className="bg-muted/30 border-border/50">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
+                    <AlertCircle className={getResponsiveIconSize('sm')} />
+                    <AlertDescription className={getResponsiveTextSize('sm')}>
                       Enter your Sentiment Analysis API key to enable enhanced sentiment analysis capabilities. 
                       This provides an additional analysis method alongside HuggingFace and Gemini models.
                     </AlertDescription>
                   </Alert>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="sentimentKey">API Key</Label>
-                    <div className="flex gap-2">
+                  <div className={getResponsiveGap('sm')}>
+                    <Label htmlFor="sentimentKey" className={getResponsiveTextSize('sm')}>API Key</Label>
+                    <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} ${getResponsiveGap('sm')}`}>
                       <div className="relative flex-1">
                         <Input
                           id="sentimentKey"
@@ -937,30 +1018,30 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
                           value={sentimentApiKey}
                           onChange={(e) => setSentimentApiKey(e.target.value)}
                           placeholder="Enter your Sentiment API key..."
-                          className="pr-10"
+                          className={`pr-10 ${getTouchFriendlyClasses()}`}
                         />
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          className={`absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent ${getTouchFriendlyClasses()}`}
                           onClick={() => setShowSentimentKey(!showSentimentKey)}
                         >
                           {showSentimentKey ? (
-                            <EyeOff className="h-4 w-4" />
+                            <EyeOff className={getResponsiveIconSize('sm')} />
                           ) : (
-                            <Eye className="h-4 w-4" />
+                            <Eye className={getResponsiveIconSize('sm')} />
                           )}
                         </Button>
                       </div>
                       {sentimentKeyStatus === 'valid' && (
                         <div className="flex items-center">
-                          <CheckCircle className="h-5 w-5 text-green-500" />
+                          <CheckCircle className={`${getResponsiveIconSize('md')} text-green-500`} />
                         </div>
                       )}
                       {sentimentKeyStatus === 'invalid' && (
                         <div className="flex items-center">
-                          <AlertCircle className="h-5 w-5 text-destructive" />
+                          <AlertCircle className={`${getResponsiveIconSize('md')} text-destructive`} />
                         </div>
                       )}
                     </div>
@@ -970,7 +1051,7 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
                     <Button
                       onClick={saveSentimentApiKey}
                       disabled={isTestingSentimentKey || !sentimentApiKey.trim()}
-                      className="bg-gradient-sentiment"
+                      className={`bg-gradient-sentiment ${getTouchFriendlyClasses()}`}
                     >
                       {isTestingSentimentKey ? (
                         <>
@@ -979,14 +1060,14 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
                             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                             className="mr-2"
                           >
-                            <Save className="h-4 w-4" />
+                            <Save className={getResponsiveIconSize('sm')} />
                           </motion.div>
-                          Testing...
+                          <span className={getResponsiveTextSize('sm')}>Testing...</span>
                         </>
                       ) : (
                         <>
-                          <Save className="mr-2 h-4 w-4" />
-                          Save & Test
+                          <Save className={`mr-2 ${getResponsiveIconSize('sm')}`} />
+                          <span className={getResponsiveTextSize('sm')}>Save & Test</span>
                         </>
                       )}
                     </Button>
@@ -995,8 +1076,9 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
                       <Button
                         variant="outline"
                         onClick={clearSentimentApiKey}
+                        className={getTouchFriendlyClasses()}
                       >
-                        Clear
+                        <span className={getResponsiveTextSize('sm')}>Clear</span>
                       </Button>
                     )}
                   </div>
@@ -1017,12 +1099,12 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
                 </div>
               </TabsContent>
 
-              <TabsContent value="data" className="space-y-6">
+              <TabsContent value="data" className={`${getResponsiveGap('lg')} space-y-4 sm:space-y-6 pb-6`}>
                 {/* Data Storage Info */}
-                <div className="space-y-4">
+                <div className={getResponsiveGap('md')}>
                   <div className="flex items-center gap-2">
-                    <Database className="h-4 w-4 text-primary" />
-                    <h3 className="text-lg font-semibold">Data Storage</h3>
+                    <Database className={`${getResponsiveIconSize('sm')} text-primary`} />
+                    <h3 className={`${getResponsiveTextSize('lg')} font-semibold`}>Data Storage</h3>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -1045,8 +1127,8 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
                   </div>
 
                   <Alert className="bg-muted/30 border-border/50">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
+                    <AlertCircle className={getResponsiveIconSize('sm')} />
+                    <AlertDescription className={getResponsiveTextSize('sm')}>
                       Data is stored locally in your browser. Maximum capacity: {getStorageInfo().maxItems} messages. 
                       Older messages are automatically removed when the limit is reached.
                     </AlertDescription>
@@ -1054,65 +1136,66 @@ export const SettingsPage = ({ onClose }: SettingsPageProps) => {
                 </div>
 
                 {/* Quick Export */}
-                <div className="space-y-4">
+                <div className={getResponsiveGap('md')}>
                   <div className="flex items-center gap-2">
-                    <Download className="h-4 w-4 text-primary" />
-                    <h3 className="text-lg font-semibold">Quick Export</h3>
+                    <Download className={`${getResponsiveIconSize('sm')} text-primary`} />
+                    <h3 className={`${getResponsiveTextSize('lg')} font-semibold`}>Quick Export</h3>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <Button
                       variant="outline"
                       onClick={() => handleQuickExport('csv')}
                       disabled={sentiments.length === 0}
-                      className="flex items-center gap-2"
+                      className={`flex items-center gap-2 ${getTouchFriendlyClasses()}`}
                     >
-                      <Download className="h-4 w-4" />
-                      Export CSV
+                      <Download className={getResponsiveIconSize('sm')} />
+                      <span className={getResponsiveTextSize('sm')}>Export CSV</span>
                     </Button>
                     <Button
                       variant="outline"
                       onClick={() => handleQuickExport('json')}
                       disabled={sentiments.length === 0}
-                      className="flex items-center gap-2"
+                      className={`flex items-center gap-2 ${getTouchFriendlyClasses()}`}
                     >
-                      <Download className="h-4 w-4" />
-                      Export JSON
+                      <Download className={getResponsiveIconSize('sm')} />
+                      <span className={getResponsiveTextSize('sm')}>Export JSON</span>
                     </Button>
                   </div>
                   
-                  <p className="text-sm text-muted-foreground">
+                  <p className={`${getResponsiveTextSize('xs')} text-muted-foreground`}>
                     For advanced export options with filters, use the Export button in the main dashboard.
                   </p>
                 </div>
 
                 {/* Data Management */}
-                <div className="space-y-4">
+                <div className={getResponsiveGap('md')}>
                   <div className="flex items-center gap-2">
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                    <h3 className="text-lg font-semibold">Data Management</h3>
+                    <Trash2 className={`${getResponsiveIconSize('sm')} text-destructive`} />
+                    <h3 className={`${getResponsiveTextSize('lg')} font-semibold`}>Data Management</h3>
                   </div>
                   
                   <div className="bg-destructive/10 p-4 rounded-lg border border-destructive/20">
-                    <p className="text-sm text-muted-foreground mb-3">
+                    <p className={`${getResponsiveTextSize('sm')} text-muted-foreground mb-3`}>
                       Clear all stored sentiment analysis data. This action cannot be undone.
                     </p>
                     <Button
                       variant="destructive"
                       onClick={handleClearHistory}
                       disabled={sentiments.length === 0}
-                      className="flex items-center gap-2"
+                      className={`flex items-center gap-2 ${getTouchFriendlyClasses()}`}
                     >
-                      <Trash2 className="h-4 w-4" />
-                      Clear All Data
+                      <Trash2 className={getResponsiveIconSize('sm')} />
+                      <span className={getResponsiveTextSize('sm')}>Clear All Data</span>
                     </Button>
                   </div>
                 </div>
               </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </div>
-  );
+            </div>
+          </Tabs>
+        </CardContent>
+      </Card>
+    </motion.div>
+  </div>
+);
 };

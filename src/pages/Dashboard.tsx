@@ -13,9 +13,11 @@ import { AdvancedAnalyticsDashboard } from '@/components/AdvancedAnalyticsDashbo
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { OnboardingTour } from '@/components/OnboardingTour';
 import { FeatureHighlight } from '@/components/FeatureHighlight';
+import { NetworkStatusIndicator } from '@/components/NetworkStatusIndicator';
 import { useSentimentAnalysis, SentimentResult } from '@/hooks/useSentimentAnalysis';
 import { usePersistedSentiments } from '@/hooks/usePersistedSentiments';
 import { useToast } from '@/hooks/use-toast';
+import { useNetworkNotifications } from '@/hooks/useNetworkNotifications';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -28,9 +30,21 @@ export const Dashboard = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showAdvancedAnalytics, setShowAdvancedAnalytics] = useState(false);
+  const [showNetworkStatus, setShowNetworkStatus] = useState(false);
   const [browserCompatible, setBrowserCompatible] = useState<boolean | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Initialize network notifications
+  const { triggerTestNotifications, triggerProviderFailureTest, triggerNetworkOfflineTest } = useNetworkNotifications({
+    showNetworkChanges: true,
+    showProviderFailures: true,
+    showProviderRecovery: true,
+    showCircuitBreakerEvents: true,
+    showPerformanceAlerts: false, // Disabled to avoid notification spam
+    minimumFailuresForNotification: 2,
+    slowResponseThreshold: 5000
+  });
 
   // Use persisted sentiments instead of regular state
   const { sentiments, addSentiment, clearHistory, getStorageInfo } = usePersistedSentiments();
@@ -209,6 +223,16 @@ export const Dashboard = () => {
               <Download className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">Export</span>
             </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowNetworkStatus(!showNetworkStatus)}
+              className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm ${showNetworkStatus ? 'bg-primary text-primary-foreground' : ''}`}
+            >
+              <Activity className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Network</span>
+            </Button>
+            
             <div className="relative">
               <Button
                 variant="outline"
@@ -262,6 +286,19 @@ export const Dashboard = () => {
               {sentiments.length} messages analyzed
             </span>
           </div>
+          
+          {/* Network Status Indicator - Compact */}
+          <div className="flex items-center gap-2">
+            <NetworkStatusIndicator compact={true} showProviderHealth={false} />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowNetworkStatus(!showNetworkStatus)}
+              className="text-xs px-2 py-1 h-auto"
+            >
+              {showNetworkStatus ? 'Hide' : 'Details'}
+            </Button>
+          </div>
         </motion.div>
 
         {/* Error Alert */}
@@ -291,7 +328,17 @@ export const Dashboard = () => {
           </motion.div>
         )}
         
-        {/* We've removed the browser compatibility warning since we're using a local engine */}
+        {/* Network Status Details - Expandable */}
+        {showNetworkStatus && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <NetworkStatusIndicator compact={false} showProviderHealth={true} />
+          </motion.div>
+        )}
 
         {/* Main Content */}
         {showAdvancedAnalytics ? (

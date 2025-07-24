@@ -1,5 +1,7 @@
 // Ollama local AI integration for sentiment analysis
 import { getAdvancedSettings, getCustomModel } from './apiPreferencesService';
+import { networkManager } from '@/utils/networkManager';
+import { ErrorClassifier } from '@/utils/errorClassifier';
 export interface OllamaModel {
   name: string;
   model: string;
@@ -89,6 +91,7 @@ export const analyzeWithOllama = async (
   message: string,
   modelName?: string
 ): Promise<OllamaSentimentResult> => {
+  const startTime = Date.now();
   const settings = getAdvancedSettings();
   const model = modelName || getCustomModel('ollama');
   const prompt = `Analyze the sentiment and emotion of this customer message. Return your response in this exact JSON format:
@@ -194,21 +197,27 @@ Important: Respond with only the JSON object, no other text. Do not include any 
       result.confidence = result.confidence / 100;
     }
 
-    return {
+    const finalResult = {
       emotion: result.emotion,
       confidence: Math.min(Math.max(result.confidence, 0), 1),
       reasoning: result.reasoning || 'Analysis completed by Ollama'
     };
 
+    // Record success
+    networkManager.recordSuccess('ollama', Date.now() - startTime);
+    return finalResult;
+
   } catch (error) {
     clearTimeout(timeoutId);
-    logger.error('Ollama API error:', error);
     
-    if (error instanceof Error) {
-      throw new Error(`Ollama analysis failed: ${error.message}`);
-    }
+    // Classify and record the error
+    const classifiedError = ErrorClassifier.classify(error as Error, 'ollama');
+    networkManager.recordFailure('ollama', error as Error);
     
-    throw new Error('Ollama analysis failed: Unknown error');
+    logger.error('Ollama API error:', classifiedError.userMessage);
+    
+    // Throw with classified error message
+    throw new Error(classifiedError.userMessage);
   }
 };
 

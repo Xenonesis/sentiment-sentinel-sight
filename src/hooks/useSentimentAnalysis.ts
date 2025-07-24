@@ -6,6 +6,8 @@ import { useRetry } from './useRetry';
 import { checkWebAssemblySupport, checkMemoryAvailability, getDiagnosticInfo } from '@/utils/browserSupport';
 import { analyzeSentiment as apiAnalyzeSentiment } from '@/services/sentimentApiService';
 import { getEnabledProvidersInOrder, isProviderEnabled, ApiProvider } from '@/services/apiPreferencesService';
+import { networkManager } from '@/utils/networkManager';
+import { ErrorClassifier } from '@/utils/errorClassifier';
 
 export interface SentimentResult {
   emotion: string;

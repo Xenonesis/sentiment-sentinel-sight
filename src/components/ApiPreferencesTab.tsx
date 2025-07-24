@@ -100,14 +100,14 @@ export const ApiPreferencesTab: React.FC<ApiPreferencesTabProps> = ({ onProvider
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2">
           <Settings className="h-4 w-4 text-primary" />
-          <h3 className="text-lg font-semibold">API Provider Preferences</h3>
+          <h3 className="text-base sm:text-lg font-semibold">API Provider Preferences</h3>
         </div>
-        <Button variant="outline" size="sm" onClick={handleReset}>
+        <Button variant="outline" size="sm" onClick={handleReset} className="self-start sm:self-auto min-h-[44px]">
           <RotateCcw className="h-4 w-4 mr-2" />
           Reset to Defaults
         </Button>
@@ -116,15 +116,15 @@ export const ApiPreferencesTab: React.FC<ApiPreferencesTabProps> = ({ onProvider
       {/* Info Alert */}
       <Alert className="bg-muted/30 border-border/50">
         <Zap className="h-4 w-4" />
-        <AlertDescription>
+        <AlertDescription className="text-sm">
           Configure which API providers to use and their priority order. The app will try providers 
           in order until one succeeds. Disabled providers will be skipped entirely.
         </AlertDescription>
       </Alert>
 
       {/* Provider List */}
-      <div className="space-y-4">
-        <h4 className="font-medium">Provider Priority Order</h4>
+      <div className="space-y-3 sm:space-y-4">
+        <h4 className="text-sm sm:text-base font-medium">Provider Priority Order</h4>
         
         {preferences.providerOrder.map((provider, index) => {
           const status = getProviderStatus(provider);
@@ -139,7 +139,7 @@ export const ApiPreferencesTab: React.FC<ApiPreferencesTabProps> = ({ onProvider
             >
               <Card className={`transition-all ${isEnabled ? 'bg-muted/20' : 'bg-muted/10 opacity-60'} ${isDefault ? 'ring-2 ring-primary/50' : ''}`}>
                 <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3 flex-1">
                       {/* Priority Number */}
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
@@ -180,7 +180,7 @@ export const ApiPreferencesTab: React.FC<ApiPreferencesTabProps> = ({ onProvider
                     </div>
 
                     {/* Controls */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-2 mt-3 sm:mt-0">
                       {/* Enable/Disable Toggle */}
                       <div className="flex items-center gap-2">
                         <Label htmlFor={`${provider}-enabled`} className="text-sm">
@@ -193,48 +193,52 @@ export const ApiPreferencesTab: React.FC<ApiPreferencesTabProps> = ({ onProvider
                         />
                       </div>
 
-                      {/* Set as Default */}
-                      {isEnabled && !isDefault && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setAsDefault(provider)}
-                        >
-                          Set Default
-                        </Button>
-                      )}
+                      <div className="flex flex-wrap gap-2">
+                        {/* Set as Default */}
+                        {isEnabled && !isDefault && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setAsDefault(provider)}
+                            className="min-h-[36px]"
+                          >
+                            Set Default
+                          </Button>
+                        )}
 
-                      {/* Configure Button */}
-                      {!status.configured && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onProviderConfigClick(provider)}
-                        >
-                          Configure
-                        </Button>
-                      )}
+                        {/* Configure Button */}
+                        {!status.configured && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => onProviderConfigClick(provider)}
+                            className="min-h-[36px]"
+                          >
+                            Configure
+                          </Button>
+                        )}
 
-                      {/* Move Up/Down */}
-                      <div className="flex flex-col gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0"
-                          onClick={() => moveProvider(provider, 'up')}
-                          disabled={index === 0}
-                        >
-                          <ArrowUp className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0"
-                          onClick={() => moveProvider(provider, 'down')}
-                          disabled={index === preferences.providerOrder.length - 1}
-                        >
-                          <ArrowDown className="h-3 w-3" />
-                        </Button>
+                        {/* Move Up/Down */}
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-9 w-9 p-0 min-h-[36px]"
+                            onClick={() => moveProvider(provider, 'up')}
+                            disabled={index === 0}
+                          >
+                            <ArrowUp className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-9 w-9 p-0 min-h-[36px]"
+                            onClick={() => moveProvider(provider, 'down')}
+                            disabled={index === preferences.providerOrder.length - 1}
+                          >
+                            <ArrowDown className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -247,15 +251,15 @@ export const ApiPreferencesTab: React.FC<ApiPreferencesTabProps> = ({ onProvider
 
       {/* Ollama Models Section */}
       {ollamaAvailable && ollamaModels.length > 0 && (
-        <div className="space-y-4">
-          <h4 className="font-medium">Ollama Models</h4>
+        <div className="space-y-3 sm:space-y-4">
+          <h4 className="text-sm sm:text-base font-medium">Ollama Models</h4>
           <Card className="bg-muted/20">
-            <CardHeader>
-              <CardTitle className="text-sm">Available Models</CardTitle>
+            <CardHeader className="p-4">
+              <CardTitle className="text-sm sm:text-base">Available Models</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="p-4 space-y-3">
               {ollamaModels.map((model) => (
-                <div key={model.name} className="flex items-center justify-between p-2 rounded border">
+                <div key={model.name} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded border gap-2">
                   <div className="flex-1">
                     <div className="font-medium text-sm">{model.name}</div>
                     <div className="text-xs text-muted-foreground">
@@ -274,11 +278,11 @@ export const ApiPreferencesTab: React.FC<ApiPreferencesTabProps> = ({ onProvider
       )}
 
       {/* Current Configuration Summary */}
-      <Card className="bg-primary/5 border-primary/20">
-        <CardHeader>
-          <CardTitle className="text-sm">Current Configuration</CardTitle>
+      <Card className="bg-primary/5 border-primary/20 sticky bottom-0 z-10 sm:static sm:z-auto">
+        <CardHeader className="p-4">
+          <CardTitle className="text-sm sm:text-base">Current Configuration</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent className="p-4 space-y-3">
           <div className="text-sm">
             <strong>Default Provider:</strong> {getProviderDisplayName(preferences.defaultProvider)}
           </div>

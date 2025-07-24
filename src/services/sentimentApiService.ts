@@ -3,6 +3,8 @@
  */
 import { logger } from '@/utils/logger';
 import { getAdvancedSettings } from './apiPreferencesService';
+import { networkManager } from '@/utils/networkManager';
+import { ErrorClassifier } from '@/utils/errorClassifier';
 
 export interface ApiSentimentResult {
   emotion: string;
@@ -27,21 +29,50 @@ const BACKUP_API_KEY = 'test_api_key';
  * @returns A promise that resolves to a sentiment analysis result
  */
 export const analyzeSentiment = async (text: string): Promise<ApiSentimentResult> => {
+  const startTime = Date.now();
+  
+  // Check network state first
+  const networkState = networkManager.getNetworkState();
+  if (!networkState.isOnline) {
+    logger.log('Device is offline, using fallback analysis');
+    return fallbackAnalysis(text);
+  }
+
   try {
-    // Try the primary API first
-    return await analyzeSentimentWithPrimaryApi(text);
-  } catch (primaryError) {
-    logger.warn('Primary API failed, trying backup API:', primaryError);
+    // Check if primary API is healthy
+    if (networkManager.isProviderHealthy('sentiment-api')) {
+      try {
+        const result = await analyzeSentimentWithPrimaryApi(text);
+        networkManager.recordSuccess('sentiment-api', Date.now() - startTime);
+        return result;
+      } catch (primaryError) {
+        const classifiedError = ErrorClassifier.classify(primaryError as Error, 'sentiment-api');
+        networkManager.recordFailure('sentiment-api', primaryError as Error);
+        logger.warn('Primary API failed:', classifiedError.userMessage);
+        
+        // If it's a non-retryable error, don't try backup
+        if (!classifiedError.isRetryable) {
+          throw primaryError;
+        }
+      }
+    }
     
+    // Try backup API if primary failed or is unhealthy
     try {
-      // Try the backup API if the primary fails
-      return await analyzeSentimentWithBackupApi(text);
+      const result = await analyzeSentimentWithBackupApi(text);
+      networkManager.recordSuccess('sentiment-api', Date.now() - startTime);
+      return result;
     } catch (backupError) {
-      logger.error('Backup API also failed:', backupError);
+      const classifiedError = ErrorClassifier.classify(backupError as Error, 'sentiment-api');
+      networkManager.recordFailure('sentiment-api', backupError as Error);
+      logger.error('Backup API also failed:', classifiedError.userMessage);
       
       // If both APIs fail, fall back to the local analysis
       return fallbackAnalysis(text);
     }
+  } catch (error) {
+    logger.error('All sentiment API attempts failed, using fallback:', error);
+    return fallbackAnalysis(text);
   }
 };
 

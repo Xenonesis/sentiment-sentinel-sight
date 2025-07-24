@@ -1,6 +1,8 @@
 // Google Gemini API integration for sentiment analysis
 import { logger } from '@/utils/logger';
 import { getAdvancedSettings, getCustomModel } from './apiPreferencesService';
+import { networkManager } from '@/utils/networkManager';
+import { ErrorClassifier } from '@/utils/errorClassifier';
 
 export interface GeminiSentimentResult {
   emotion: string;
@@ -9,10 +11,21 @@ export interface GeminiSentimentResult {
 }
 
 export const analyzeWithGemini = async (message: string): Promise<GeminiSentimentResult> => {
+  const startTime = Date.now();
   const apiKey = localStorage.getItem('gemini_api_key');
   
   if (!apiKey) {
-    throw new Error('Google Gemini API key not configured. Please add it in Settings.');
+    const error = new Error('Google Gemini API key not configured. Please add it in Settings.');
+    networkManager.recordFailure('gemini', error);
+    throw error;
+  }
+
+  // Check network connectivity
+  const networkState = networkManager.getNetworkState();
+  if (!networkState.isOnline) {
+    const error = new Error('No internet connection available for Gemini API');
+    networkManager.recordFailure('gemini', error);
+    throw error;
   }
 
   const prompt = `Analyze the sentiment and emotion of this customer message. Return your response in this exact JSON format:
@@ -91,21 +104,27 @@ Important: Respond with only the JSON object, no other text. Do not include any 
       result.confidence = result.confidence / 100;
     }
 
-    return {
+    const finalResult = {
       emotion: result.emotion,
       confidence: Math.min(Math.max(result.confidence, 0), 1),
       reasoning: result.reasoning
     };
 
+    // Record success
+    networkManager.recordSuccess('gemini', Date.now() - startTime);
+    return finalResult;
+
   } catch (error) {
     clearTimeout(timeoutId);
-    logger.error('Gemini API error:', error);
     
-    if (error instanceof Error) {
-      throw new Error(`Gemini analysis failed: ${error.message}`);
-    }
+    // Classify and record the error
+    const classifiedError = ErrorClassifier.classify(error as Error, 'gemini');
+    networkManager.recordFailure('gemini', error as Error);
     
-    throw new Error('Gemini analysis failed: Unknown error');
+    logger.error('Gemini API error:', classifiedError.userMessage);
+    
+    // Throw with classified error message
+    throw new Error(classifiedError.userMessage);
   }
 };
 

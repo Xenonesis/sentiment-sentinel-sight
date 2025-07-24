@@ -2,8 +2,92 @@
 
 All notable changes to the Sentiment Sentinel Sight project will be documented in this file.
 
+## [1.1.9] - 2025-07-24
+
+### 🛡️ Enhanced Error Handling & Network Monitoring
+
+#### Added
+- **Circuit Breaker Pattern**: Prevents cascading failures with configurable thresholds
+- **Network Manager**: Centralized network state and provider health management
+- **Smart Error Classification**: Categorizes errors into 8 types with specific recovery strategies
+- **Real-time Network Monitoring**: Live network status and provider health indicators
+- **Enhanced Bulk Analysis**: Adaptive error handling with mid-batch provider switching
+- **Network Notifications**: Real-time alerts for provider failures and recovery
+- **Provider Health Dashboard**: Visual monitoring of API response times and success rates
+
+#### Improved
+- **Automatic Fallback**: Network-aware provider selection with offline capability detection
+- **Error Messages**: User-friendly messages with actionable guidance for resolution
+- **Bulk Operations**: Resilient to provider failures with adaptive batch sizing
+- **Performance Tracking**: Response time monitoring with exponential moving averages
+
+#### Technical Enhancements
+- Added `NetworkManager` class with circuit breaker functionality
+- Added `ErrorClassifier` for intelligent error categorization and recovery
+- Added `useNetworkNotifications` hook for real-time status updates
+- Enhanced all API services with network awareness and health monitoring
+- Added `NetworkStatusIndicator` component for dashboard integration
+
+#### Developer Experience
+- Comprehensive test suite for network monitoring scenarios
+- Detailed error logging with classification and recovery strategies
+- Real-time provider health visualization and manual reset capabilities
+
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.1.8] - 2025-07-24
+
+### 🐛 Bug Fixes
+- **Fixed Component State Variables**: Fixed missing and duplicate state variables in the SettingsPage component
+- **Fixed Code Structure**: Improved overall code structure and organization
+
+## [1.1.7] - 2025-07-24
+
+### 🐛 Bug Fixes
+- **Fixed Duplicate Export Statements**: Removed duplicate export statements in the SettingsPage component
+- **Fixed Build Error**: Resolved "Unexpected export" error during build
+
+## [1.1.6] - 2025-07-24
+
+### 🐛 Bug Fixes
+- **Fixed Duplicate Closing Tags**: Removed duplicate closing tags in the SettingsPage component
+- **Fixed JSX Structure**: Corrected the overall JSX structure to ensure proper nesting of components
+
+## [1.1.5] - 2025-07-24
+
+### 🐛 Bug Fixes
+- **Fixed Mismatched JSX Tags**: Corrected mismatched opening and closing JSX tags in the SettingsPage component
+- **Fixed Build Errors**: Resolved build errors related to JSX structure
+
+## [1.1.4] - 2025-07-24
+
+### 🐛 Bug Fixes
+- **Fixed Missing Component Closure**: Added missing closing bracket and semicolon to the SettingsPage component
+- **Fixed JSX Syntax Error**: Resolved JSX syntax error that was preventing the app from compiling
+
+## [1.1.3] - 2025-07-24
+
+### 🐛 Bug Fixes
+- **Fixed Duplicate Imports**: Resolved duplicate imports from ollamaService causing syntax errors
+- **Fixed Compilation Errors**: Fixed syntax errors preventing the app from compiling
+
+## [1.1.2] - 2025-07-24
+
+### 🐛 Bug Fixes
+- **Fixed Settings Page**: Resolved issues with the settings page that were causing 500 errors
+- **Fixed Import Errors**: Removed duplicate imports that were causing conflicts
+- **Improved Error Handling**: Enhanced error handling in the settings components
+
+## [1.1.1] - 2025-07-24
+
+### 🎨 UI/UX Enhancements
+- **Improved Settings UI**: Enhanced mobile and desktop responsiveness for the settings page
+- **Touch-Friendly Controls**: Optimized form elements and buttons for better touch interaction
+- **Consistent Spacing**: Standardized padding and spacing across all settings tabs
+- **Better Tab Navigation**: Improved tab navigation on mobile with horizontal scrolling
+- **Responsive Layouts**: Adjusted layouts to adapt better to different screen sizes
+- **Improved Text Readability**: Optimized text sizes for better readability on all devices
 
 ## [1.1.0] - 2025-07-24
 

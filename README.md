@@ -4,7 +4,7 @@
 
 ![Sentinel Sight Banner](https://img.shields.io/badge/🧠%20Sentinel%20Sight-AI%20Powered%20Sentiment%20Analysis-6366f1?style=for-the-badge&labelColor=1e293b&color=6366f1)
 
-![Version](https://img.shields.io/badge/version-1.1.0-22c55e?style=for-the-badge&logo=semver&logoColor=white)
+![Version](https://img.shields.io/badge/version-1.1.9-22c55e?style=for-the-badge&logo=semver&logoColor=white)
 ![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.5.3-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![AI](https://img.shields.io/badge/HuggingFace-Transformers-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)
@@ -35,6 +35,8 @@
 - **Cloud Power**: Google Gemini 2.0 Flash for enhanced accuracy
 - **Sentiment API**: Additional analysis engine for comprehensive results
 - **Smart Failover**: Automatic switching between AI providers
+- **🛡️ Circuit Breaker Protection**: Advanced error handling with automatic provider switching (v1.1.9)
+- **📡 Network Monitoring**: Real-time network and API health monitoring with notifications (v1.1.9)
 - **Confidence Scoring**: Precise accuracy percentages
 
 </td>

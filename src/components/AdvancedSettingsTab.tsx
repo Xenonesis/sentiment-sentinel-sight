@@ -121,13 +121,13 @@ export const AdvancedSettingsTab: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Sliders className="h-5 w-5" />
-          <h3 className="text-lg font-semibold">Advanced Analysis Settings</h3>
+          <Sliders className="h-4 w-4 sm:h-5 sm:w-5" />
+          <h3 className="text-base sm:text-lg font-semibold">Advanced Analysis Settings</h3>
         </div>
-        <Button variant="outline" size="sm" onClick={resetToDefaults}>
+        <Button variant="outline" size="sm" onClick={resetToDefaults} className="self-start sm:self-auto">
           <RotateCcw className="h-4 w-4 mr-2" />
           Reset to Defaults
         </Button>
@@ -135,7 +135,7 @@ export const AdvancedSettingsTab: React.FC = () => {
 
       <Alert>
         <Info className="h-4 w-4" />
-        <AlertDescription>
+        <AlertDescription className="text-sm">
           These settings control advanced behavior for API calls and model parameters. 
           Changes take effect immediately for new analysis requests.
         </AlertDescription>
@@ -143,16 +143,16 @@ export const AdvancedSettingsTab: React.FC = () => {
 
       {/* Timeout and Retry Settings */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
             <Clock className="h-4 w-4" />
             Request Settings
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="p-4 sm:p-6 space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <div className="space-y-2">
-              <Label htmlFor="timeout">API Timeout (seconds)</Label>
+              <Label htmlFor="timeout" className="text-sm font-medium">API Timeout (seconds)</Label>
               <Input
                 id="timeout"
                 type="number"
@@ -161,23 +161,24 @@ export const AdvancedSettingsTab: React.FC = () => {
                 value={settings.timeout / 1000}
                 onChange={(e) => handleTimeoutChange(e.target.value)}
                 placeholder="30"
+                className="min-h-[44px]"
               />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 How long to wait for API responses (1-120 seconds)
               </p>
             </div>
             
             <div className="space-y-2">
-              <Label>Retry Attempts: {settings.retryAttempts}</Label>
+              <Label className="text-sm font-medium">Retry Attempts: {settings.retryAttempts}</Label>
               <Slider
                 value={[settings.retryAttempts]}
                 onValueChange={handleRetryAttemptsChange}
                 max={5}
                 min={0}
                 step={1}
-                className="w-full"
+                className="w-full min-h-[44px] touch-manipulation"
               />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Number of retry attempts on failure (0-5)
               </p>
             </div>
@@ -187,27 +188,27 @@ export const AdvancedSettingsTab: React.FC = () => {
 
       {/* Custom Models */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
             <Cpu className="h-4 w-4" />
             Custom Models
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="p-4 sm:p-6 space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {/* HuggingFace Model */}
             <div className="space-y-2">
-              <Label>HuggingFace Model</Label>
+              <Label className="text-sm font-medium">HuggingFace Model</Label>
               <Select
                 value={settings.customModels.huggingface}
                 onValueChange={(value) => handleCustomModelChange('huggingface', value)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="min-h-[44px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {huggingfaceModels.map((model) => (
-                    <SelectItem key={model} value={model}>
+                    <SelectItem key={model} value={model} className="text-sm">
                       {model}
                     </SelectItem>
                   ))}
@@ -217,17 +218,17 @@ export const AdvancedSettingsTab: React.FC = () => {
 
             {/* Gemini Model */}
             <div className="space-y-2">
-              <Label>Gemini Model</Label>
+              <Label className="text-sm font-medium">Gemini Model</Label>
               <Select
                 value={settings.customModels.gemini}
                 onValueChange={(value) => handleCustomModelChange('gemini', value)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="min-h-[44px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {geminiModels.map((model) => (
-                    <SelectItem key={model} value={model}>
+                    <SelectItem key={model} value={model} className="text-sm">
                       {model}
                     </SelectItem>
                   ))}
@@ -237,18 +238,18 @@ export const AdvancedSettingsTab: React.FC = () => {
 
             {/* Ollama Model */}
             <div className="space-y-2">
-              <Label>Ollama Model</Label>
+              <Label className="text-sm font-medium">Ollama Model</Label>
               <Select
                 value={settings.customModels.ollama}
                 onValueChange={(value) => handleCustomModelChange('ollama', value)}
                 disabled={isLoadingOllama}
               >
-                <SelectTrigger>
+                <SelectTrigger className="min-h-[44px]">
                   <SelectValue placeholder={isLoadingOllama ? "Loading..." : "Select model"} />
                 </SelectTrigger>
                 <SelectContent>
                   {ollamaModels.map((model) => (
-                    <SelectItem key={model} value={model}>
+                    <SelectItem key={model} value={model} className="text-sm">
                       {model}
                     </SelectItem>
                   ))}
@@ -258,18 +259,18 @@ export const AdvancedSettingsTab: React.FC = () => {
 
             {/* Sentiment API Model */}
             <div className="space-y-2">
-              <Label>Sentiment API Model</Label>
+              <Label className="text-sm font-medium">Sentiment API Model</Label>
               <Select
                 value={settings.customModels['sentiment-api']}
                 onValueChange={(value) => handleCustomModelChange('sentiment-api', value)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="min-h-[44px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="general">General</SelectItem>
-                  <SelectItem value="finance">Finance</SelectItem>
-                  <SelectItem value="hotels">Hotels</SelectItem>
+                  <SelectItem value="general" className="text-sm">General</SelectItem>
+                  <SelectItem value="finance" className="text-sm">Finance</SelectItem>
+                  <SelectItem value="hotels" className="text-sm">Hotels</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -279,64 +280,68 @@ export const AdvancedSettingsTab: React.FC = () => {
 
       {/* Model Parameters */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
             <Settings className="h-4 w-4" />
             Model Parameters
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Gemini Parameters */}
           <div className="space-y-4">
-            <h4 className="font-medium flex items-center gap-2">
+            <h4 className="text-sm sm:text-base font-medium flex items-center gap-2">
               Gemini Parameters
-              <Badge variant="secondary">Advanced</Badge>
+              <Badge variant="secondary" className="text-xs">Advanced</Badge>
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
-                <Label>Temperature: {settings.modelParameters.gemini.temperature}</Label>
+                <Label className="text-sm font-medium">Temperature: {settings.modelParameters.gemini.temperature}</Label>
                 <Slider
                   value={[settings.modelParameters.gemini.temperature]}
                   onValueChange={(value) => handleGeminiParameterChange('temperature', value[0])}
                   max={2}
                   min={0}
                   step={0.1}
+                  className="min-h-[44px] touch-manipulation"
                 />
                 <p className="text-xs text-muted-foreground">Controls randomness (0 = deterministic, 2 = very random)</p>
               </div>
               
               <div className="space-y-2">
-                <Label>Top P: {settings.modelParameters.gemini.topP}</Label>
+                <Label className="text-sm font-medium">Top P: {settings.modelParameters.gemini.topP}</Label>
                 <Slider
                   value={[settings.modelParameters.gemini.topP]}
                   onValueChange={(value) => handleGeminiParameterChange('topP', value[0])}
                   max={1}
                   min={0}
                   step={0.1}
+                  className="min-h-[44px] touch-manipulation"
                 />
                 <p className="text-xs text-muted-foreground">Nucleus sampling threshold</p>
               </div>
               
               <div className="space-y-2">
-                <Label>Top K: {settings.modelParameters.gemini.topK}</Label>
+                <Label className="text-sm font-medium">Top K: {settings.modelParameters.gemini.topK}</Label>
                 <Slider
                   value={[settings.modelParameters.gemini.topK]}
                   onValueChange={(value) => handleGeminiParameterChange('topK', value[0])}
                   max={40}
                   min={1}
                   step={1}
+                  className="min-h-[44px] touch-manipulation"
                 />
                 <p className="text-xs text-muted-foreground">Number of top tokens to consider</p>
               </div>
               
               <div className="space-y-2">
-                <Label>Max Output Tokens: {settings.modelParameters.gemini.maxOutputTokens}</Label>
+                <Label className="text-sm font-medium">Max Output Tokens: {settings.modelParameters.gemini.maxOutputTokens}</Label>
                 <Slider
                   value={[settings.modelParameters.gemini.maxOutputTokens]}
                   onValueChange={(value) => handleGeminiParameterChange('maxOutputTokens', value[0])}
                   max={1000}
                   min={50}
                   step={50}
+                  className="min-h-[44px] touch-manipulation"
                 />
                 <p className="text-xs text-muted-foreground">Maximum response length</p>
               </div>
@@ -347,43 +352,46 @@ export const AdvancedSettingsTab: React.FC = () => {
 
           {/* Ollama Parameters */}
           <div className="space-y-4">
-            <h4 className="font-medium flex items-center gap-2">
+            <h4 className="text-sm sm:text-base font-medium flex items-center gap-2">
               Ollama Parameters
-              <Badge variant="secondary">Advanced</Badge>
+              <Badge variant="secondary" className="text-xs">Advanced</Badge>
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
-                <Label>Temperature: {settings.modelParameters.ollama.temperature}</Label>
+                <Label className="text-sm font-medium">Temperature: {settings.modelParameters.ollama.temperature}</Label>
                 <Slider
                   value={[settings.modelParameters.ollama.temperature]}
                   onValueChange={(value) => handleOllamaParameterChange('temperature', value[0])}
                   max={2}
                   min={0}
                   step={0.1}
+                  className="min-h-[44px] touch-manipulation"
                 />
                 <p className="text-xs text-muted-foreground">Controls randomness</p>
               </div>
               
               <div className="space-y-2">
-                <Label>Top P: {settings.modelParameters.ollama.top_p}</Label>
+                <Label className="text-sm font-medium">Top P: {settings.modelParameters.ollama.top_p}</Label>
                 <Slider
                   value={[settings.modelParameters.ollama.top_p]}
                   onValueChange={(value) => handleOllamaParameterChange('top_p', value[0])}
                   max={1}
                   min={0}
                   step={0.1}
+                  className="min-h-[44px] touch-manipulation"
                 />
                 <p className="text-xs text-muted-foreground">Nucleus sampling threshold</p>
               </div>
               
               <div className="space-y-2">
-                <Label>Top K: {settings.modelParameters.ollama.top_k}</Label>
+                <Label className="text-sm font-medium">Top K: {settings.modelParameters.ollama.top_k}</Label>
                 <Slider
                   value={[settings.modelParameters.ollama.top_k]}
                   onValueChange={(value) => handleOllamaParameterChange('top_k', value[0])}
                   max={100}
                   min={1}
                   step={1}
+                  className="min-h-[44px] touch-manipulation"
                 />
                 <p className="text-xs text-muted-foreground">Number of top tokens to consider</p>
               </div>
